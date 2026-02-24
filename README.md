@@ -2,7 +2,9 @@
 
 A private property management app for tracking rental contracts, invoices, and tenant billing. Built for managing real estate rentals/share house with per-tenant invoicing, guest access codes, and admin controls.
 
-This was whipped up quickly for myself for managing my tenants and collecting rent. So it isn't the best maintained codebase :p.
+This was whipped up for myself so I can manage my tenants and collect rent.
+<img width="1466" height="737" alt="Screenshot 2026-02-24 at 10 34 20 PM" src="https://github.com/user-attachments/assets/8d2ef968-3374-492e-bbad-52194c60ac5e" />
+
 
 ## Features
 
