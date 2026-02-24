@@ -1,4 +1,7 @@
+import { api, HydrateClient } from "~/trpc/server";
 import { PropertyDetail } from "./_components/property-detail";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Property Details - Property Manager" };
 
@@ -10,5 +13,15 @@ export default async function PropertyDetailPage({
   const { id } = await params;
   const propertyId = Number(id);
 
-  return <PropertyDetail propertyId={propertyId} />;
+  void api.properties.getById.prefetch({ id: propertyId });
+  void api.user.me.prefetch();
+  void api.properties.getImageUrl.prefetch({ storagePath: "" });
+  void api.contracts.listByProperty.prefetch({ propertyId });
+  void api.invoices.list.prefetch({ propertyId });
+
+  return (
+    <HydrateClient>
+      <PropertyDetail propertyId={propertyId} />
+    </HydrateClient>
+  );
 }

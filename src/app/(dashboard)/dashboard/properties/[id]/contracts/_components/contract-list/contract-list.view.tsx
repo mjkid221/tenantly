@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Link from "next/link";
 import {
   FileText,
   Upload,
@@ -46,22 +45,48 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb";
+import { BlurFade } from "~/components/ui/blur-fade";
 import type { ContractListViewProps } from "./contract-list.types";
 
 function LoadingSkeleton() {
   return (
     <div className="space-y-6">
-      <Skeleton className="h-6 w-48" />
-      <Skeleton className="h-10 w-64" />
-      <Card>
+      {/* Breadcrumb */}
+      <Skeleton className="h-5 w-64" />
+
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <Skeleton className="h-9 w-40" />
+          <Skeleton className="h-5 w-56" />
+        </div>
+        <Skeleton className="h-10 w-40 rounded-md" />
+      </div>
+
+      {/* Version Selector */}
+      <div className="flex items-center gap-4">
+        <Skeleton className="h-5 w-14" />
+        <Skeleton className="h-10 w-70 rounded-md" />
+      </div>
+
+      {/* Contract Detail Card */}
+      <Card className="rounded-2xl">
         <CardHeader>
-          <Skeleton className="h-6 w-40" />
+          <div className="space-y-1.5">
+            <Skeleton className="h-6 w-48" />
+            <Skeleton className="h-4 w-32" />
+          </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-32 w-full" />
+        <CardContent className="space-y-3">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Skeleton className="h-5 w-40" />
+            <Skeleton className="h-5 w-36" />
+          </div>
         </CardContent>
       </Card>
+
+      {/* PDF Viewer */}
+      <Skeleton className="h-[85vh] w-full rounded-2xl" />
     </div>
   );
 }
@@ -170,47 +195,53 @@ export function ContractListView({
 
   return (
     <div className="space-y-6">
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/dashboard/properties">
-              Properties
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href={`/dashboard/properties/${propertyId}`}>
-              {propertyName ?? "Property"}
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Contracts</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <BlurFade delay={0.05}>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard/properties">
+                Properties
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href={`/dashboard/properties/${propertyId}`}>
+                {propertyName ?? "Property"}
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Contracts</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </BlurFade>
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Contracts</h1>
-          <p className="text-muted-foreground">
-            Lease agreements for {propertyName ?? "this property"}
-          </p>
+      <BlurFade delay={0.1}>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Contracts</h1>
+            <p className="text-muted-foreground">
+              Lease agreements for {propertyName ?? "this property"}
+            </p>
+          </div>
+          {isAdmin && (
+            <Button onClick={() => setShowUploadDialog(true)}>
+              <Upload className="mr-2 h-4 w-4" />
+              Upload Contract
+            </Button>
+          )}
         </div>
-        {isAdmin && (
-          <Button onClick={() => setShowUploadDialog(true)}>
-            <Upload className="mr-2 h-4 w-4" />
-            Upload Contract
-          </Button>
-        )}
-      </div>
+      </BlurFade>
 
       {contracts.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <FileText className="mb-4 h-12 w-12 text-muted-foreground/40" />
-            <h3 className="text-lg font-semibold">No contracts yet</h3>
-            <p className="mb-4 text-sm text-muted-foreground">
+        <BlurFade delay={0.15}>
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 text-center">
+            <div className="rounded-2xl bg-muted p-4">
+              <FileText className="h-8 w-8 text-muted-foreground/40" />
+            </div>
+            <h3 className="mt-4 text-lg font-semibold">No contracts yet</h3>
+            <p className="mt-1 mb-4 text-sm text-muted-foreground">
               {isAdmin
                 ? "Upload the first lease contract for this property."
                 : "No contracts have been uploaded yet."}
@@ -221,9 +252,10 @@ export function ContractListView({
                 Upload Contract
               </Button>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </BlurFade>
       ) : (
+        <BlurFade delay={0.15}>
         <div className="space-y-4">
           {/* Version Selector */}
           <div className="flex items-center gap-4">
@@ -232,7 +264,7 @@ export function ContractListView({
               value={selectedContractId?.toString() ?? ""}
               onValueChange={(val) => onSelectContract(Number(val))}
             >
-              <SelectTrigger className="w-[280px]">
+              <SelectTrigger className="w-70">
                 <SelectValue placeholder="Select contract version" />
               </SelectTrigger>
               <SelectContent>
@@ -251,7 +283,7 @@ export function ContractListView({
 
           {/* Selected Contract Details */}
           {selectedContract && (
-            <Card>
+            <Card className="rounded-2xl">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div>
@@ -335,8 +367,21 @@ export function ContractListView({
             </Card>
           )}
 
+          {/* PDF Viewer */}
+          {selectedContract && downloadUrl && (
+            <Card className="overflow-hidden rounded-2xl">
+              <CardContent className="p-0">
+                <iframe
+                  src={downloadUrl}
+                  title={selectedContract.fileName}
+                  className="h-[85vh] w-full border-0"
+                />
+              </CardContent>
+            </Card>
+          )}
+
           {/* All Versions List */}
-          <Card>
+          <Card className="rounded-2xl">
             <CardHeader>
               <CardTitle>All Versions</CardTitle>
             </CardHeader>
@@ -345,7 +390,7 @@ export function ContractListView({
                 {contracts.map((contract) => (
                   <div
                     key={contract.id}
-                    className={`flex items-center justify-between rounded-lg border p-3 transition-colors ${
+                    className={`flex items-center justify-between rounded-xl border p-3 transition-colors ${
                       contract.id === selectedContractId
                         ? "border-primary bg-primary/5"
                         : "hover:bg-muted/50"
@@ -381,6 +426,7 @@ export function ContractListView({
             </CardContent>
           </Card>
         </div>
+        </BlurFade>
       )}
 
       <UploadDialog

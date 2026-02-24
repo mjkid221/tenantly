@@ -102,10 +102,10 @@ export function usePropertyForm(
   const onSubmit = (values: PropertyFormValues) => {
     const cleanedValues = {
       ...values,
-      addressLine2: values.addressLine2 || undefined,
-      state: values.state || undefined,
-      postalCode: values.postalCode || undefined,
-      description: values.description || undefined,
+      addressLine2: values.addressLine2 ?? undefined,
+      state: values.state ?? undefined,
+      postalCode: values.postalCode ?? undefined,
+      description: values.description ?? undefined,
     };
 
     if (mode === "edit" && initialData) {

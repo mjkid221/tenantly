@@ -44,6 +44,7 @@ export function useContractList(propertyId: number) {
 
   const uploadMutation = api.contracts.upload.useMutation({
     onSuccess: async () => {
+      setSelectedContractId(null);
       await utils.contracts.listByProperty.invalidate({ propertyId });
       setShowUploadDialog(false);
       toast.success("Contract uploaded successfully");

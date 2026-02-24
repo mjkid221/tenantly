@@ -1,0 +1,21 @@
+{
+  "$schema": "https://unpkg.com/knip@latest/schema.json",
+  "entry": [
+    "src/app/**/*.{ts,tsx}",
+    "src/server/**/*.ts",
+    "src/env.js"
+  ],
+  "project": ["src/**/*.{ts,tsx,js}"],
+  "ignoreDependencies": [
+    "drizzle-kit",
+    "eslint-config-next",
+    "shadcn",
+    "supabase",
+    "tailwindcss",
+    "tsx",
+    "tw-animate-css"
+  ],
+  "drizzle": {
+    "config": []
+  }
+}

@@ -44,6 +44,6 @@ export function useGuestPropertyView(code: string) {
     contract,
     isLoading,
     error,
-    allowedSections: allowedSections as string[],
+    allowedSections,
   };
 }

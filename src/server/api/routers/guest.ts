@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { guestAccessCodes, properties, contracts } from "~/server/db/schema";
+import { guestAccessCodes, contracts } from "~/server/db/schema";
 import { supabaseAdmin } from "~/lib/supabase/admin";
 
 function validateGuestCode(

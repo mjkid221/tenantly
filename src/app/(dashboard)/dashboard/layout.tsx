@@ -11,8 +11,8 @@ export default function DashboardLayout({
     <SidebarProvider>
       <AppSidebar />
       <main className="flex flex-1 flex-col">
-        <header className="flex h-14 items-center gap-2 border-b px-6">
-          <SidebarTrigger />
+        <header className="bg-background/80 sticky top-0 z-10 flex h-14 items-center gap-2 border-b px-4 backdrop-blur-md">
+          <SidebarTrigger className="-ml-2" />
           <Separator orientation="vertical" className="h-6" />
         </header>
         <div className="flex-1 overflow-auto p-6">{children}</div>

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { and, desc, eq, max } from "drizzle-orm";
+import { and, eq, max } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { TRPCError } from "@trpc/server";
 

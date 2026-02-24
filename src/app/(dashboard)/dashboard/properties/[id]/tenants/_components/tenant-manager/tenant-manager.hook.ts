@@ -59,7 +59,7 @@ export function useTenantManager(propertyId: number) {
     assignMutation.mutate({
       propertyId,
       email,
-      moveInDate: moveInDate || undefined,
+      moveInDate: moveInDate ?? undefined,
     });
   };
 

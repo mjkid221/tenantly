@@ -9,6 +9,7 @@ import {
   FileText,
   Upload,
   DollarSign,
+  Receipt,
 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import {
@@ -58,6 +59,7 @@ import { Label } from "~/components/ui/label";
 import { Badge } from "~/components/ui/badge";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Separator } from "~/components/ui/separator";
+import { BlurFade } from "~/components/ui/blur-fade";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -72,21 +74,34 @@ import type {
   LineItem,
 } from "./invoice-detail.types";
 
-const statusVariantMap: Record<
+const statusConfig: Record<
   string,
-  "default" | "secondary" | "destructive" | "outline"
+  { label: string; dotColor: string; bgColor: string; textColor: string }
 > = {
-  draft: "secondary",
-  issued: "default",
-  partially_paid: "outline",
-  paid: "default",
-};
-
-const statusLabelMap: Record<string, string> = {
-  draft: "Draft",
-  issued: "Issued",
-  partially_paid: "Partially Paid",
-  paid: "Paid",
+  draft: {
+    label: "Draft",
+    dotColor: "bg-zinc-400",
+    bgColor: "bg-zinc-500/10",
+    textColor: "text-zinc-600 dark:text-zinc-400",
+  },
+  issued: {
+    label: "Issued",
+    dotColor: "bg-amber-500",
+    bgColor: "bg-amber-500/10",
+    textColor: "text-amber-700 dark:text-amber-400",
+  },
+  partially_paid: {
+    label: "Partially Paid",
+    dotColor: "bg-orange-500",
+    bgColor: "bg-orange-500/10",
+    textColor: "text-orange-700 dark:text-orange-400",
+  },
+  paid: {
+    label: "Paid",
+    dotColor: "bg-emerald-500",
+    bgColor: "bg-emerald-500/10",
+    textColor: "text-emerald-700 dark:text-emerald-400",
+  },
 };
 
 function formatCurrency(amount: number): string {
@@ -125,10 +140,15 @@ export function InvoiceDetailView({
   isUpdatingStatus,
   onUploadProof,
   isUploadingProof,
+  onDeleteInvoice,
+  isDeleting,
+  showDeleteDialog,
+  setShowDeleteDialog,
   isAddLineItemDialogOpen,
   onAddLineItemDialogOpenChange,
 }: InvoiceDetailViewProps) {
   const [formCategoryId, setFormCategoryId] = useState<string>("");
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [formTotalBill, setFormTotalBill] = useState("");
   const [formTenantCharge, setFormTenantCharge] = useState("");
   const [formProportionType, setFormProportionType] = useState<string>("fixed");
@@ -175,17 +195,71 @@ export function InvoiceDetailView({
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-8 w-64" />
-        <Skeleton className="h-48 w-full" />
-        <Skeleton className="h-64 w-full" />
+        {/* Breadcrumb */}
+        <Skeleton className="h-5 w-48" />
+
+        {/* Invoice Header Card */}
+        <Card className="rounded-2xl">
+          <CardHeader>
+            <div className="flex items-start justify-between">
+              <div className="space-y-2">
+                <Skeleton className="h-7 w-48" />
+                <Skeleton className="h-5 w-64" />
+              </div>
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-7 w-20 rounded-full" />
+                <Skeleton className="h-10 w-40 rounded-md" />
+              </div>
+            </div>
+          </CardHeader>
+        </Card>
+
+        {/* Line Items Card */}
+        <Card className="rounded-2xl">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="space-y-1.5">
+                <Skeleton className="h-6 w-24" />
+                <Skeleton className="h-4 w-40" />
+              </div>
+              <Skeleton className="h-9 w-32 rounded-md" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-1">
+              <Skeleton className="h-10 w-full" />
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="h-14 w-full" />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Summary Card */}
+        <Card className="rounded-2xl">
+          <CardHeader>
+            <Skeleton className="h-6 w-24" />
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-6 w-full" />
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   if (!invoice) {
     return (
-      <div className="flex flex-col items-center justify-center py-24">
-        <p className="text-lg font-medium">Invoice not found</p>
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-20">
+        <div className="rounded-2xl bg-muted p-4">
+          <Receipt className="h-8 w-8 text-muted-foreground/40" />
+        </div>
+        <p className="mt-4 text-lg font-medium">Invoice not found</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          The invoice you are looking for does not exist or you do not have access.
+        </p>
         <Button asChild variant="outline" className="mt-4">
           <Link href="/dashboard/invoices">Back to Invoices</Link>
         </Button>
@@ -208,72 +282,90 @@ export function InvoiceDetailView({
       />
 
       {/* Breadcrumb */}
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href="/dashboard/invoices">Invoices</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{breadcrumbLabel}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <BlurFade delay={0.05}>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/dashboard/invoices">Invoices</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{breadcrumbLabel}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </BlurFade>
 
       {/* Invoice Header */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div className="space-y-1">
-              <CardTitle className="text-2xl">
-                {invoice.property.name}
-              </CardTitle>
-              <CardDescription className="text-base">
-                {invoice.billingPeriodStart} to {invoice.billingPeriodEnd}
-                {invoice.label && ` -- ${invoice.label}`}
-              </CardDescription>
+      <BlurFade delay={0.1}>
+        <Card className="rounded-2xl">
+          <CardHeader>
+            <div className="flex items-start justify-between">
+              <div className="space-y-1">
+                <CardTitle className="text-2xl">
+                  {invoice.property.name}
+                </CardTitle>
+                <CardDescription className="text-base">
+                  {invoice.billingPeriodStart} to {invoice.billingPeriodEnd}
+                  {invoice.label && ` -- ${invoice.label}`}
+                </CardDescription>
+              </div>
+              <div className="flex items-center gap-3">
+                {(() => {
+                  const status = statusConfig[invoice.status] ?? statusConfig.draft!;
+                  return (
+                    <span
+                      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium ${status.bgColor} ${status.textColor}`}
+                    >
+                      <span className={`h-2 w-2 rounded-full ${status.dotColor}`} />
+                      {status.label}
+                    </span>
+                  );
+                })()}
+                {isAdmin && (
+                  <>
+                    <Select
+                      value={invoice.status}
+                      onValueChange={(v) =>
+                        onUpdateStatus(v as InvoiceStatusValue)
+                      }
+                      disabled={isUpdatingStatus}
+                    >
+                      <SelectTrigger className="w-40">
+                        <SelectValue placeholder="Change status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="draft">Draft</SelectItem>
+                        <SelectItem value="issued">Issued</SelectItem>
+                        <SelectItem value="partially_paid">
+                          Partially Paid
+                        </SelectItem>
+                        <SelectItem value="paid">Paid</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {invoice.status === "draft" && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                        onClick={() => setShowDeleteDialog(true)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Badge
-                variant={statusVariantMap[invoice.status] ?? "secondary"}
-                className={`text-sm ${
-                  invoice.status === "paid"
-                    ? "bg-green-100 text-green-700 hover:bg-green-100"
-                    : ""
-                }`}
-              >
-                {statusLabelMap[invoice.status] ?? invoice.status}
-              </Badge>
-              {isAdmin && (
-                <Select
-                  value={invoice.status}
-                  onValueChange={(v) =>
-                    onUpdateStatus(v as InvoiceStatusValue)
-                  }
-                  disabled={isUpdatingStatus}
-                >
-                  <SelectTrigger className="w-[160px]">
-                    <SelectValue placeholder="Change status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="draft">Draft</SelectItem>
-                    <SelectItem value="issued">Issued</SelectItem>
-                    <SelectItem value="partially_paid">
-                      Partially Paid
-                    </SelectItem>
-                    <SelectItem value="paid">Paid</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
+          </CardHeader>
+        </Card>
+      </BlurFade>
 
       {/* Line Items Table */}
-      <Card>
+      <BlurFade delay={0.15}>
+      <Card className="rounded-2xl">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -319,7 +411,6 @@ export function InvoiceDetailView({
                           ) : (
                             categories.map((c) => (
                               <SelectItem key={c.id} value={String(c.id)}>
-                                {c.icon ? `${c.icon} ` : ""}
                                 {c.name}
                               </SelectItem>
                             ))
@@ -435,10 +526,12 @@ export function InvoiceDetailView({
         </CardHeader>
         <CardContent>
           {invoice.lineItems.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <DollarSign className="mb-4 h-12 w-12 text-muted-foreground" />
-              <p className="text-lg font-medium">No line items yet</p>
-              <p className="text-sm text-muted-foreground">
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 text-center">
+              <div className="rounded-2xl bg-muted p-4">
+                <DollarSign className="h-8 w-8 text-muted-foreground/40" />
+              </div>
+              <p className="mt-4 text-lg font-medium">No line items yet</p>
+              <p className="mt-1 text-sm text-muted-foreground">
                 {isAdmin
                   ? "Add billing items to this invoice."
                   : "No charges have been added yet."}
@@ -472,7 +565,6 @@ export function InvoiceDetailView({
                   return (
                     <TableRow key={li.id}>
                       <TableCell className="font-medium">
-                        {li.category.icon ? `${li.category.icon} ` : ""}
                         {li.category.name}
                         {li.description && (
                           <p className="text-xs text-muted-foreground">
@@ -607,10 +699,12 @@ export function InvoiceDetailView({
           )}
         </CardContent>
       </Card>
+      </BlurFade>
 
       {/* Summary */}
       {paymentStatus && (
-        <Card>
+        <BlurFade delay={0.2}>
+        <Card className="rounded-2xl">
           <CardHeader>
             <CardTitle>Summary</CardTitle>
           </CardHeader>
@@ -649,7 +743,50 @@ export function InvoiceDetailView({
             </div>
           </CardContent>
         </Card>
+        </BlurFade>
       )}
+
+      {/* Delete Invoice Confirmation */}
+      <AlertDialog
+        open={showDeleteDialog}
+        onOpenChange={(open) => {
+          setShowDeleteDialog(open);
+          if (!open) setDeleteConfirmText("");
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Invoice</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this draft invoice and all its line
+              items. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="delete-confirm">
+              Type <span className="font-mono font-semibold">DELETE</span> to
+              confirm
+            </Label>
+            <Input
+              id="delete-confirm"
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder="DELETE"
+              autoComplete="off"
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={onDeleteInvoice}
+              disabled={isDeleting || deleteConfirmText !== "DELETE"}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? "Deleting..." : "Delete Invoice"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

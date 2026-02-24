@@ -54,8 +54,8 @@ export const propertyTenants = createTable(
       .references(() => properties.id, { onDelete: "cascade" }),
     userId: d
       .integer("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
+      .references(() => users.id, { onDelete: "set null" }),
+    email: d.varchar({ length: 320 }).notNull(),
     moveInDate: d.date("move_in_date"),
     moveOutDate: d.date("move_out_date"),
     isActive: d.boolean("is_active").notNull().default(true),
@@ -68,6 +68,6 @@ export const propertyTenants = createTable(
   (t) => [
     index("property_tenant_property_idx").on(t.propertyId),
     index("property_tenant_user_idx").on(t.userId),
-    uniqueIndex("property_tenant_unique_idx").on(t.propertyId, t.userId),
+    uniqueIndex("property_tenant_unique_idx").on(t.propertyId, t.email),
   ],
 );

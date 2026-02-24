@@ -24,6 +24,16 @@ export function usePropertyDetail(propertyId: number) {
     { enabled: !!property?.images.length },
   );
 
+  const { data: contracts } = api.contracts.listByProperty.useQuery(
+    { propertyId },
+    { enabled: !isNaN(propertyId) },
+  );
+
+  const { data: invoices } = api.invoices.list.useQuery(
+    { propertyId },
+    { enabled: !isNaN(propertyId) },
+  );
+
   const deleteMutation = api.properties.delete.useMutation({
     onSuccess: async () => {
       await utils.properties.list.invalidate();
@@ -66,5 +76,7 @@ export function usePropertyDetail(propertyId: number) {
     isRemovingImage: removeImageMutation.isPending,
     showDeleteDialog,
     setShowDeleteDialog,
+    contracts: contracts ?? [],
+    invoices: invoices ?? [],
   };
 }

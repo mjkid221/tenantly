@@ -1,5 +1,7 @@
-import { api } from "~/trpc/server";
+import { api, HydrateClient } from "~/trpc/server";
 import { DashboardHome } from "./_components/dashboard-home";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Dashboard - Property Manager",
@@ -7,5 +9,13 @@ export const metadata = {
 
 export default async function DashboardPage() {
   const user = await api.user.me();
-  return <DashboardHome role={user.role} userName={user.fullName} />;
+
+  void api.properties.list.prefetch();
+  void api.invoices.list.prefetch();
+
+  return (
+    <HydrateClient>
+      <DashboardHome role={user.role} userName={user.fullName} />
+    </HydrateClient>
+  );
 }

@@ -56,6 +56,7 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Badge } from "~/components/ui/badge";
 import { Skeleton } from "~/components/ui/skeleton";
+import { BlurFade } from "~/components/ui/blur-fade";
 import {
   ALLOWED_SECTIONS,
   type GuestCodeManagerViewProps,
@@ -110,6 +111,7 @@ export function GuestCodeManagerView({
 
   return (
     <div className="space-y-6">
+      <BlurFade delay={0.05}>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Guest Codes</h1>
@@ -216,8 +218,10 @@ export function GuestCodeManagerView({
           </DialogContent>
         </Dialog>
       </div>
+      </BlurFade>
 
-      <Card>
+      <BlurFade delay={0.1}>
+      <Card className="rounded-2xl">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Key className="h-5 w-5" />
@@ -236,10 +240,12 @@ export function GuestCodeManagerView({
               ))}
             </div>
           ) : guestCodes.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <Key className="mb-4 h-12 w-12 text-muted-foreground" />
-              <p className="text-lg font-medium">No guest codes yet</p>
-              <p className="text-sm text-muted-foreground">
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 text-center">
+              <div className="rounded-2xl bg-muted p-4">
+                <Key className="h-8 w-8 text-muted-foreground/40" />
+              </div>
+              <p className="mt-4 text-lg font-medium">No guest codes yet</p>
+              <p className="mt-1 text-sm text-muted-foreground">
                 Create your first guest code to share property access.
               </p>
             </div>
@@ -275,14 +281,15 @@ export function GuestCodeManagerView({
                         {isExpired ? (
                           <Badge variant="destructive">Expired</Badge>
                         ) : gc.isEnabled ? (
-                          <Badge
-                            variant="default"
-                            className="bg-green-100 text-green-700 hover:bg-green-100"
-                          >
+                          <Badge variant="secondary" className="gap-1.5 rounded-full">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                             Enabled
                           </Badge>
                         ) : (
-                          <Badge variant="secondary">Disabled</Badge>
+                          <Badge variant="secondary" className="gap-1.5 rounded-full">
+                            <span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
+                            Disabled
+                          </Badge>
                         )}
                       </TableCell>
                       <TableCell>
@@ -374,6 +381,7 @@ export function GuestCodeManagerView({
           )}
         </CardContent>
       </Card>
+      </BlurFade>
     </div>
   );
 }

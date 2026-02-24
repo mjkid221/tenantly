@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { api } from "~/trpc/react";
 import { toast } from "sonner";
 import type { AddLineItemFormValues, InvoiceStatusValue } from "./invoice-detail.types";
 
 export function useInvoiceDetail(id: number) {
+  const router = useRouter();
   const [isAddLineItemDialogOpen, setIsAddLineItemDialogOpen] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const { data: user } = api.user.me.useQuery();
   const {
@@ -79,6 +82,17 @@ export function useInvoiceDetail(id: number) {
     },
   });
 
+  const deleteInvoice = api.invoices.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Invoice deleted");
+      void utils.invoices.list.invalidate();
+      router.push("/dashboard/invoices");
+    },
+    onError: (error) => {
+      toast.error(error.message ?? "Failed to delete invoice");
+    },
+  });
+
   const onAddLineItem = (values: AddLineItemFormValues) => {
     addLineItem.mutate({
       invoiceId: id,
@@ -138,6 +152,10 @@ export function useInvoiceDetail(id: number) {
     isUpdatingStatus: updateStatus.isPending,
     onUploadProof,
     isUploadingProof: uploadProof.isPending,
+    onDeleteInvoice: () => deleteInvoice.mutate({ id }),
+    isDeleting: deleteInvoice.isPending,
+    showDeleteDialog,
+    setShowDeleteDialog,
     isAddLineItemDialogOpen,
     onAddLineItemDialogOpenChange: setIsAddLineItemDialogOpen,
   };

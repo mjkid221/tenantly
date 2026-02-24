@@ -20,7 +20,6 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Badge } from "~/components/ui/badge";
 import { Skeleton } from "~/components/ui/skeleton";
-import { Separator } from "~/components/ui/separator";
 import {
   Dialog,
   DialogContent,
@@ -47,25 +46,43 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb";
+import { BlurFade } from "~/components/ui/blur-fade";
 import type { TenantManagerViewProps } from "./tenant-manager.types";
 
 function LoadingSkeleton() {
   return (
     <div className="space-y-6">
-      <Skeleton className="h-6 w-48" />
-      <Skeleton className="h-10 w-64" />
-      <Card>
+      {/* Breadcrumb */}
+      <Skeleton className="h-5 w-64" />
+
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <Skeleton className="h-9 w-32" />
+          <Skeleton className="h-5 w-56" />
+        </div>
+        <Skeleton className="h-10 w-32 rounded-md" />
+      </div>
+
+      {/* Active Tenants Card */}
+      <Card className="rounded-2xl">
         <CardHeader>
-          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-5 w-40" />
         </CardHeader>
         <CardContent className="space-y-4">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <Skeleton className="h-10 w-10 rounded-full" />
-              <div className="space-y-1">
-                <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-3 w-48" />
+            <div
+              key={i}
+              className="flex items-center justify-between rounded-xl border p-4"
+            >
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="space-y-1.5">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3.5 w-48" />
+                </div>
               </div>
+              <Skeleton className="h-5 w-16 rounded-full" />
             </div>
           ))}
         </CardContent>
@@ -101,8 +118,9 @@ function AddTenantDialog({
         <DialogHeader>
           <DialogTitle>Add Tenant</DialogTitle>
           <DialogDescription>
-            Assign a tenant to this property by their email address. They must
-            have signed in at least once.
+            Assign a tenant to this property by their email address. If they
+            haven&apos;t signed up yet, they&apos;ll be linked automatically when
+            they do.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -174,47 +192,53 @@ export function TenantManagerView({
 
   return (
     <div className="space-y-6">
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/dashboard/properties">
-              Properties
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href={`/dashboard/properties/${propertyId}`}>
-              {propertyName ?? "Property"}
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Tenants</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <BlurFade delay={0.05}>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard/properties">
+                Properties
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href={`/dashboard/properties/${propertyId}`}>
+                {propertyName ?? "Property"}
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Tenants</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </BlurFade>
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Tenants</h1>
-          <p className="text-muted-foreground">
-            Manage tenants for {propertyName ?? "this property"}
-          </p>
+      <BlurFade delay={0.1}>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Tenants</h1>
+            <p className="text-muted-foreground">
+              Manage tenants for {propertyName ?? "this property"}
+            </p>
+          </div>
+          {isAdmin && (
+            <Button onClick={() => setShowAddDialog(true)}>
+              <UserPlus className="mr-2 h-4 w-4" />
+              Add Tenant
+            </Button>
+          )}
         </div>
-        {isAdmin && (
-          <Button onClick={() => setShowAddDialog(true)}>
-            <UserPlus className="mr-2 h-4 w-4" />
-            Add Tenant
-          </Button>
-        )}
-      </div>
+      </BlurFade>
 
       {tenants.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <Users className="mb-4 h-12 w-12 text-muted-foreground/40" />
-            <h3 className="text-lg font-semibold">No tenants assigned</h3>
-            <p className="mb-4 text-sm text-muted-foreground">
+        <BlurFade delay={0.15}>
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 text-center">
+            <div className="rounded-2xl bg-muted p-4">
+              <Users className="h-8 w-8 text-muted-foreground/40" />
+            </div>
+            <h3 className="mt-4 text-lg font-semibold">No tenants assigned</h3>
+            <p className="mt-1 mb-4 text-sm text-muted-foreground">
               {isAdmin
                 ? "Add tenants to this property by their email address."
                 : "No tenants have been assigned yet."}
@@ -225,15 +249,16 @@ export function TenantManagerView({
                 Add Tenant
               </Button>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </BlurFade>
       ) : (
+        <BlurFade delay={0.15}>
         <div className="space-y-6">
           {/* Active Tenants */}
-          <Card>
+          <Card className="rounded-2xl">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                <Users className="h-4 w-4" />
                 Active Tenants ({activeTenants.length})
               </CardTitle>
             </CardHeader>
@@ -247,21 +272,21 @@ export function TenantManagerView({
                   {activeTenants.map((tenant) => (
                     <div
                       key={tenant.id}
-                      className="flex items-center justify-between rounded-lg border p-4"
+                      className="flex items-center justify-between rounded-xl border p-4 transition-colors hover:bg-accent/50"
                     >
                       <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">
-                          {tenant.user.fullName?.[0]?.toUpperCase() ??
-                            tenant.user.email[0]?.toUpperCase()}
+                          {tenant.user?.fullName?.[0]?.toUpperCase() ??
+                            tenant.email[0]?.toUpperCase()}
                         </div>
                         <div>
                           <p className="font-medium">
-                            {tenant.user.fullName ?? tenant.user.email}
+                            {tenant.user?.fullName ?? tenant.email}
                           </p>
                           <div className="flex items-center gap-3 text-sm text-muted-foreground">
                             <span className="flex items-center gap-1">
                               <Mail className="h-3 w-3" />
-                              {tenant.user.email}
+                              {tenant.email}
                             </span>
                             {tenant.moveInDate && (
                               <span className="flex items-center gap-1">
@@ -276,7 +301,15 @@ export function TenantManagerView({
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant="default">Active</Badge>
+                        {!tenant.user && (
+                          <Badge variant="outline" className="gap-1.5 rounded-full border-amber-200 text-amber-600 dark:border-amber-800 dark:text-amber-400">
+                            Pending sign-up
+                          </Badge>
+                        )}
+                        <Badge variant="secondary" className="gap-1.5 rounded-full">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                          Active
+                        </Badge>
                         {isAdmin && (
                           <Button
                             variant="ghost"
@@ -296,10 +329,10 @@ export function TenantManagerView({
 
           {/* Inactive Tenants */}
           {inactiveTenants.length > 0 && (
-            <Card>
+            <Card className="rounded-2xl">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-muted-foreground">
-                  <Users className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2 text-base font-semibold text-muted-foreground">
+                  <Users className="h-4 w-4" />
                   Past Tenants ({inactiveTenants.length})
                 </CardTitle>
               </CardHeader>
@@ -308,21 +341,21 @@ export function TenantManagerView({
                   {inactiveTenants.map((tenant) => (
                     <div
                       key={tenant.id}
-                      className="flex items-center justify-between rounded-lg border border-dashed p-4 opacity-75"
+                      className="flex items-center justify-between rounded-xl border border-dashed p-4 opacity-75"
                     >
                       <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted font-semibold text-muted-foreground">
-                          {tenant.user.fullName?.[0]?.toUpperCase() ??
-                            tenant.user.email[0]?.toUpperCase()}
+                          {tenant.user?.fullName?.[0]?.toUpperCase() ??
+                            tenant.email[0]?.toUpperCase()}
                         </div>
                         <div>
                           <p className="font-medium">
-                            {tenant.user.fullName ?? tenant.user.email}
+                            {tenant.user?.fullName ?? tenant.email}
                           </p>
                           <div className="flex items-center gap-3 text-sm text-muted-foreground">
                             <span className="flex items-center gap-1">
                               <Mail className="h-3 w-3" />
-                              {tenant.user.email}
+                              {tenant.email}
                             </span>
                             {tenant.moveOutDate && (
                               <span className="flex items-center gap-1">
@@ -336,7 +369,10 @@ export function TenantManagerView({
                           </div>
                         </div>
                       </div>
-                      <Badge variant="outline">Inactive</Badge>
+                      <Badge variant="secondary" className="gap-1.5 rounded-full">
+                      <span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
+                      Inactive
+                    </Badge>
                     </div>
                   ))}
                 </div>
@@ -344,6 +380,7 @@ export function TenantManagerView({
             </Card>
           )}
         </div>
+        </BlurFade>
       )}
 
       {/* Add Tenant Dialog */}
@@ -362,8 +399,8 @@ export function TenantManagerView({
             <AlertDialogDescription>
               Are you sure you want to remove{" "}
               <strong>
-                {tenantToRemove?.user.fullName ??
-                  tenantToRemove?.user.email ??
+                {tenantToRemove?.user?.fullName ??
+                  tenantToRemove?.email ??
                   "this tenant"}
               </strong>{" "}
               from this property? They will be marked as inactive and their

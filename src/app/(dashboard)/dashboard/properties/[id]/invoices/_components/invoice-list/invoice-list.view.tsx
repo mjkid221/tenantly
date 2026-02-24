@@ -1,14 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Receipt, Plus, Calendar, DollarSign } from "lucide-react";
+import { Receipt, Plus, Calendar } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
+import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Skeleton } from "~/components/ui/skeleton";
 import {
@@ -27,6 +22,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb";
+import { BlurFade } from "~/components/ui/blur-fade";
 import type { InvoiceListViewProps, InvoiceStatus } from "./invoice-list.types";
 
 const statusConfig: Record<
@@ -65,16 +61,25 @@ function formatDate(date: string) {
 function LoadingSkeleton() {
   return (
     <div className="space-y-6">
-      <Skeleton className="h-6 w-48" />
-      <Skeleton className="h-10 w-64" />
-      <Card>
-        <CardHeader>
-          <Skeleton className="h-6 w-32" />
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
+      {/* Breadcrumb */}
+      <Skeleton className="h-5 w-64" />
+
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <Skeleton className="h-9 w-32" />
+          <Skeleton className="h-5 w-48" />
+        </div>
+        <Skeleton className="h-10 w-36 rounded-md" />
+      </div>
+
+      {/* Table Card */}
+      <Card className="rounded-2xl">
+        <CardContent className="p-0">
+          <div className="space-y-1 p-4">
+            <Skeleton className="h-10 w-full" />
             {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-12 w-full" />
+              <Skeleton key={i} className="h-14 w-full" />
             ))}
           </div>
         </CardContent>
@@ -96,51 +101,57 @@ export function InvoiceListView({
 
   return (
     <div className="space-y-6">
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/dashboard/properties">
-              Properties
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href={`/dashboard/properties/${propertyId}`}>
-              {propertyName ?? "Property"}
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Invoices</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <BlurFade delay={0.05}>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard/properties">
+                Properties
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href={`/dashboard/properties/${propertyId}`}>
+                {propertyName ?? "Property"}
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Invoices</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </BlurFade>
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Invoices</h1>
-          <p className="text-muted-foreground">
-            Billing for {propertyName ?? "this property"}
-          </p>
+      <BlurFade delay={0.1}>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Invoices</h1>
+            <p className="text-muted-foreground">
+              Billing for {propertyName ?? "this property"}
+            </p>
+          </div>
+          {isAdmin && (
+            <Button asChild>
+              <Link
+                href={`/dashboard/invoices/new?propertyId=${propertyId}`}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Create Invoice
+              </Link>
+            </Button>
+          )}
         </div>
-        {isAdmin && (
-          <Button asChild>
-            <Link
-              href={`/dashboard/invoices/new?propertyId=${propertyId}`}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Create Invoice
-            </Link>
-          </Button>
-        )}
-      </div>
+      </BlurFade>
 
       {invoices.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <Receipt className="mb-4 h-12 w-12 text-muted-foreground/40" />
-            <h3 className="text-lg font-semibold">No invoices yet</h3>
-            <p className="mb-4 text-sm text-muted-foreground">
+        <BlurFade delay={0.15}>
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 text-center">
+            <div className="rounded-2xl bg-muted p-4">
+              <Receipt className="h-8 w-8 text-muted-foreground/40" />
+            </div>
+            <h3 className="mt-4 text-lg font-semibold">No invoices yet</h3>
+            <p className="mt-1 mb-4 text-sm text-muted-foreground">
               {isAdmin
                 ? "Create the first invoice for this property."
                 : "No invoices have been created yet."}
@@ -155,10 +166,11 @@ export function InvoiceListView({
                 </Link>
               </Button>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </BlurFade>
       ) : (
-        <Card>
+        <BlurFade delay={0.15}>
+        <Card className="rounded-2xl">
           <CardContent className="p-0">
             <Table>
               <TableHeader>
@@ -169,7 +181,7 @@ export function InvoiceListView({
                   <TableHead>Total</TableHead>
                   <TableHead>Tenant Charge</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="w-[100px]" />
+                  <TableHead className="w-25" />
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -229,6 +241,7 @@ export function InvoiceListView({
             </Table>
           </CardContent>
         </Card>
+        </BlurFade>
       )}
     </div>
   );

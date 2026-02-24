@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   Building2,
   MapPin,
@@ -37,7 +38,7 @@ export function GuestPropertyViewComponent({
             <p className="text-lg font-medium">Access Denied</p>
             <p className="mt-2 text-sm text-muted-foreground">{error}</p>
             <Button variant="outline" className="mt-6" asChild>
-              <a href="/guest">Try Another Code</a>
+              <Link href="/guest">Try Another Code</Link>
             </Button>
           </CardContent>
         </Card>

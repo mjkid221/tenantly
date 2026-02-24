@@ -1,10 +1,10 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 import { db } from "~/server/db";
-import { users, admins } from "~/server/db/schema";
+import { users, admins, propertyTenants } from "~/server/db/schema";
 import { createSupabaseServerClient } from "~/lib/supabase/server";
 
 export const createTRPCContext = async (opts: { headers: Headers }) => {
@@ -37,6 +37,17 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
         })
         .returning();
       dbUser = newUser!;
+
+      // Auto-link pending tenant assignments by email
+      await db
+        .update(propertyTenants)
+        .set({ userId: newUser!.id })
+        .where(
+          and(
+            eq(propertyTenants.email, supabaseUser.email!),
+            isNull(propertyTenants.userId),
+          ),
+        );
     }
 
     const isAdmin = await db.query.admins.findFirst({
@@ -130,7 +141,7 @@ const enforceTenantOrAdmin = t.middleware(async ({ ctx, next }) => {
     });
   }
   return next({
-    ctx: { ...ctx, user: ctx.user, role: ctx.role as "admin" | "tenant" },
+    ctx: { ...ctx, user: ctx.user, role: ctx.role },
   });
 });
 

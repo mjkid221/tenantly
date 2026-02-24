@@ -25,7 +25,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "~/components/ui/dialog";
 import {
   AlertDialog,
@@ -42,7 +41,8 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import type { AdminPanelViewProps, Category } from "./admin-panel.types";
+import { BlurFade } from "~/components/ui/blur-fade";
+import type { AdminPanelViewProps } from "./admin-panel.types";
 
 function CategoryFormDialog({
   open,
@@ -58,22 +58,20 @@ function CategoryFormDialog({
   onSubmit: (values: {
     name: string;
     description: string;
-    icon: string;
     sortOrder: number;
   }) => void;
   isSubmitting: boolean;
-  initialValues?: { name: string; description: string; icon: string; sortOrder: number };
+  initialValues?: { name: string; description: string; sortOrder: number };
   title: string;
   description: string;
 }) {
   const [name, setName] = useState(initialValues?.name ?? "");
   const [desc, setDesc] = useState(initialValues?.description ?? "");
-  const [icon, setIcon] = useState(initialValues?.icon ?? "");
   const [sortOrder, setSortOrder] = useState(initialValues?.sortOrder ?? 0);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ name, description: desc, icon, sortOrder });
+    onSubmit({ name, description: desc, sortOrder });
   };
 
   return (
@@ -103,25 +101,14 @@ function CategoryFormDialog({
               placeholder="Brief description"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="catIcon">Icon (optional)</Label>
-              <Input
-                id="catIcon"
-                value={icon}
-                onChange={(e) => setIcon(e.target.value)}
-                placeholder="e.g. emoji or icon name"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="catSort">Sort Order</Label>
-              <Input
-                id="catSort"
-                type="number"
-                value={sortOrder}
-                onChange={(e) => setSortOrder(Number(e.target.value))}
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="catSort">Sort Order</Label>
+            <Input
+              id="catSort"
+              type="number"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(Number(e.target.value))}
+            />
           </div>
           <DialogFooter>
             <Button
@@ -163,13 +150,16 @@ export function AdminPanelView({
 }: AdminPanelViewProps) {
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Admin Panel</h1>
-        <p className="text-muted-foreground">
-          Manage administrators and invoice categories.
-        </p>
-      </div>
+      <BlurFade delay={0.05}>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Admin Panel</h1>
+          <p className="text-muted-foreground">
+            Manage administrators and invoice categories.
+          </p>
+        </div>
+      </BlurFade>
 
+      <BlurFade delay={0.1}>
       <Tabs defaultValue="admins">
         <TabsList>
           <TabsTrigger value="admins">
@@ -184,7 +174,7 @@ export function AdminPanelView({
 
         {/* Admin Management Tab */}
         <TabsContent value="admins" className="space-y-4">
-          <Card>
+          <Card className="rounded-2xl">
             <CardHeader>
               <CardTitle>Add Admin</CardTitle>
               <CardDescription>
@@ -220,7 +210,7 @@ export function AdminPanelView({
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="rounded-2xl">
             <CardHeader>
               <CardTitle>Current Admins</CardTitle>
               <CardDescription>
@@ -315,7 +305,7 @@ export function AdminPanelView({
 
         {/* Category Management Tab */}
         <TabsContent value="categories" className="space-y-4">
-          <Card>
+          <Card className="rounded-2xl">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
@@ -349,7 +339,6 @@ export function AdminPanelView({
                   <TableHeader>
                     <TableRow>
                       <TableHead>Name</TableHead>
-                      <TableHead>Icon</TableHead>
                       <TableHead>Sort Order</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
@@ -365,7 +354,6 @@ export function AdminPanelView({
                             </p>
                           )}
                         </TableCell>
-                        <TableCell>{category.icon ?? "--"}</TableCell>
                         <TableCell>{category.sortOrder}</TableCell>
                         <TableCell className="text-right">
                           <Button
@@ -385,6 +373,7 @@ export function AdminPanelView({
           </Card>
         </TabsContent>
       </Tabs>
+      </BlurFade>
 
       {/* Create Category Dialog */}
       <CategoryFormDialog
@@ -410,7 +399,6 @@ export function AdminPanelView({
           initialValues={{
             name: editingCategory.name,
             description: editingCategory.description ?? "",
-            icon: editingCategory.icon ?? "",
             sortOrder: editingCategory.sortOrder,
           }}
           title="Edit Category"

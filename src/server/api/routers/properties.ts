@@ -232,22 +232,16 @@ export const propertiesRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      // Look up user — may not exist yet (pending sign-up)
       const user = await ctx.db.query.users.findFirst({
         where: eq(users.email, input.email),
       });
 
-      if (!user) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "User not found. They must sign in at least once first.",
-        });
-      }
-
-      // Check if already assigned
+      // Check if already assigned (by email, not userId)
       const existing = await ctx.db.query.propertyTenants.findFirst({
         where: and(
           eq(propertyTenants.propertyId, input.propertyId),
-          eq(propertyTenants.userId, user.id),
+          eq(propertyTenants.email, input.email),
         ),
       });
 
@@ -258,11 +252,12 @@ export const propertiesRouter = createTRPCRouter({
             message: "Tenant is already assigned to this property",
           });
         }
-        // Re-activate
+        // Re-activate (and link user if they now exist)
         const [updated] = await ctx.db
           .update(propertyTenants)
           .set({
             isActive: true,
+            userId: user?.id ?? existing.userId,
             moveInDate: input.moveInDate ?? null,
             moveOutDate: null,
           })
@@ -275,7 +270,8 @@ export const propertiesRouter = createTRPCRouter({
         .insert(propertyTenants)
         .values({
           propertyId: input.propertyId,
-          userId: user.id,
+          email: input.email,
+          userId: user?.id ?? null,
           moveInDate: input.moveInDate ?? null,
         })
         .returning();

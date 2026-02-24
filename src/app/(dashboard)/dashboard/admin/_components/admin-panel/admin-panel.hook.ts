@@ -78,7 +78,6 @@ export function useAdminPanel() {
     createCategory.mutate({
       name: values.name,
       description: values.description || undefined,
-      icon: values.icon || undefined,
       sortOrder: values.sortOrder,
     });
   };
@@ -88,7 +87,6 @@ export function useAdminPanel() {
       id: values.id,
       name: values.name,
       description: values.description || undefined,
-      icon: values.icon || undefined,
       sortOrder: values.sortOrder,
     });
   };

@@ -1,17 +1,18 @@
+import { api, HydrateClient } from "~/trpc/server";
 import { PropertyList } from "./_components/property-list";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Properties - Property Manager" };
 
-export default function PropertiesPage() {
+export default async function PropertiesPage() {
+  void api.properties.list.prefetch();
+  void api.user.me.prefetch();
+  void api.properties.getImageUrl.prefetch({ storagePath: "" });
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Properties</h1>
-          <p className="text-muted-foreground">Manage your properties</p>
-        </div>
-      </div>
+    <HydrateClient>
       <PropertyList />
-    </div>
+    </HydrateClient>
   );
 }

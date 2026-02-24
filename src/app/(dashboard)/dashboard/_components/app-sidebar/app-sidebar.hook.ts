@@ -40,7 +40,7 @@ export function useAppSidebar() {
 
   return {
     navItems,
-    role: role as "admin" | "tenant",
+    role,
     userName: user?.fullName ?? null,
     userEmail: user?.email ?? "",
     userAvatar: user?.avatarUrl ?? null,

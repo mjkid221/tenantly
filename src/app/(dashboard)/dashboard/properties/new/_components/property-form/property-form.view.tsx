@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { ImagePlus, X, Upload, Loader2 } from "lucide-react";
+import { X, Upload, Loader2 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -18,6 +18,7 @@ import {
   FormLabel,
   FormMessage,
 } from "~/components/ui/form";
+import { BlurFade } from "~/components/ui/blur-fade";
 import type { PropertyFormViewProps } from "./property-form.types";
 
 export function PropertyFormView({
@@ -38,7 +39,8 @@ export function PropertyFormView({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <Card>
+        <BlurFade delay={0.05}>
+        <Card className="rounded-2xl">
           <CardHeader>
             <CardTitle>Property Details</CardTitle>
           </CardHeader>
@@ -76,8 +78,10 @@ export function PropertyFormView({
             />
           </CardContent>
         </Card>
+        </BlurFade>
 
-        <Card>
+        <BlurFade delay={0.1}>
+        <Card className="rounded-2xl">
           <CardHeader>
             <CardTitle>Address</CardTitle>
           </CardHeader>
@@ -174,14 +178,16 @@ export function PropertyFormView({
             </div>
           </CardContent>
         </Card>
+        </BlurFade>
 
-        <Card>
+        <BlurFade delay={0.15}>
+        <Card className="rounded-2xl">
           <CardHeader>
             <CardTitle>Images</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div
-              className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 transition-colors ${
+              className={`flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 transition-colors ${
                 isDragging
                   ? "border-primary bg-primary/5"
                   : "border-muted-foreground/25 hover:border-primary/50"
@@ -218,7 +224,7 @@ export function PropertyFormView({
                 {images.map((image, index) => (
                   <div
                     key={`${image.fileName}-${index}`}
-                    className="group relative aspect-video overflow-hidden rounded-lg border"
+                    className="group relative aspect-video overflow-hidden rounded-xl border"
                   >
                     <img
                       src={image.preview}
@@ -243,7 +249,9 @@ export function PropertyFormView({
             )}
           </CardContent>
         </Card>
+        </BlurFade>
 
+        <BlurFade delay={0.2}>
         <div className="flex justify-end gap-4">
           <Button
             type="button"
@@ -258,6 +266,7 @@ export function PropertyFormView({
             {mode === "edit" ? "Update Property" : "Create Property"}
           </Button>
         </div>
+        </BlurFade>
       </form>
     </Form>
   );

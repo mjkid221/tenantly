@@ -36,6 +36,12 @@ export interface InvoiceDetailViewProps {
   onUploadProof: (lineItemId: number, file: File) => void;
   isUploadingProof: boolean;
 
+  // Delete invoice (admin only, draft only)
+  onDeleteInvoice: () => void;
+  isDeleting: boolean;
+  showDeleteDialog: boolean;
+  setShowDeleteDialog: (open: boolean) => void;
+
   // Dialog state
   isAddLineItemDialogOpen: boolean;
   onAddLineItemDialogOpenChange: (open: boolean) => void;

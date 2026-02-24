@@ -32,7 +32,6 @@ export interface AdminPanelViewProps {
 export interface CreateCategoryFormValues {
   name: string;
   description: string;
-  icon: string;
   sortOrder: number;
 }
 
@@ -40,6 +39,5 @@ export interface UpdateCategoryFormValues {
   id: number;
   name: string;
   description: string;
-  icon: string;
   sortOrder: number;
 }
