@@ -31,6 +31,7 @@ async function seed() {
     { name: "Water", icon: "droplets", sortOrder: 3 },
     { name: "Internet", icon: "wifi", sortOrder: 4 },
     { name: "Rates", icon: "landmark", sortOrder: 5 },
+    { name: "Rent", icon: "home", sortOrder: 6 },
   ];
 
   console.log("Adding default invoice categories...");
