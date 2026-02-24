@@ -136,7 +136,7 @@ export function InvoiceListView({
           </div>
           {isAdmin && (
             <Button asChild>
-              <Link href={`/dashboard/invoices/new?propertyId=${propertyId}`}>
+              <Link href={`/dashboard/invoices?propertyId=${propertyId}`}>
                 <Plus className="mr-2 h-4 w-4" />
                 Create Invoice
               </Link>
@@ -159,7 +159,7 @@ export function InvoiceListView({
             </p>
             {isAdmin && (
               <Button asChild>
-                <Link href={`/dashboard/invoices/new?propertyId=${propertyId}`}>
+                <Link href={`/dashboard/invoices?propertyId=${propertyId}`}>
                   <Plus className="mr-2 h-4 w-4" />
                   Create Invoice
                 </Link>
