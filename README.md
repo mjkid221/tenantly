@@ -1,29 +1,27 @@
-# Create T3 App
+# Private Real Estate Manager
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+A private property management app for tracking rental contracts, invoices, and tenant billing. Built for managing real estate rentals/share house with per-tenant invoicing, guest access codes, and admin controls.
 
-## What's next? How do I make an app with this?
+This was whipped up quickly for myself for managing my tenants and collecting rent. So it isn't the best maintained codebase :p.
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+## Features
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+- **Property Management** -- Add properties with images, addresses, and tenant assignments
+- **Tenant Billing** -- Create invoices per-property or per-tenant (e.g. share house bill splitting), with line items, categories, and file attachments
+- **Contracts** -- Upload and manage rental contracts per property
+- **Payments** -- Track tenant payments against invoice line items
+- **Guest Access** -- Generate time-limited access codes so tenants can view their invoices without an account
+- **Email Invoices** -- Send invoices directly to tenants via Resend
+- **Admin Dashboard** -- Full admin controls with role-based access (admin vs tenant views)
+- **OAuth Login** -- Google and Microsoft sign-in via Supabase Auth
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+## Getting Started
 
-## Learn More
+```bash
+cp .env.example .env
+pnpm install
+pnpm db:push
+pnpm dev
+```
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
-
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
-
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
-
-## How do I deploy this?
-
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+Requires a running Supabase instance (local via `supabase start` or hosted).
