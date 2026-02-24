@@ -1,7 +1,6 @@
 import type { RouterOutputs } from "~/trpc/react";
 
-export type Contract =
-  RouterOutputs["contracts"]["listByProperty"][number];
+export type Contract = RouterOutputs["contracts"]["listByProperty"][number];
 
 export interface ContractListViewProps {
   propertyId: number;

@@ -26,22 +26,59 @@ export function useGuestCodeManager() {
   });
 
   const updateGuestCode = api.admin.updateGuestCode.useMutation({
+    onMutate: async (variables) => {
+      await utils.admin.listGuestCodes.cancel();
+      const previous = utils.admin.listGuestCodes.getData();
+      utils.admin.listGuestCodes.setData(undefined, (old) => {
+        if (!old) return old;
+        return old.map((gc) =>
+          gc.id === variables.id
+            ? {
+                ...gc,
+                ...(variables.isEnabled !== undefined && {
+                  isEnabled: variables.isEnabled,
+                }),
+              }
+            : gc,
+        );
+      });
+      return { previous };
+    },
     onSuccess: () => {
       toast.success("Guest code updated");
-      void utils.admin.listGuestCodes.invalidate();
     },
-    onError: (error) => {
+    onError: (error, _vars, context) => {
+      if (context?.previous) {
+        utils.admin.listGuestCodes.setData(undefined, context.previous);
+      }
       toast.error(error.message ?? "Failed to update guest code");
+    },
+    onSettled: () => {
+      void utils.admin.listGuestCodes.invalidate();
     },
   });
 
   const deleteGuestCode = api.admin.deleteGuestCode.useMutation({
+    onMutate: async (variables) => {
+      await utils.admin.listGuestCodes.cancel();
+      const previous = utils.admin.listGuestCodes.getData();
+      utils.admin.listGuestCodes.setData(undefined, (old) => {
+        if (!old) return old;
+        return old.filter((gc) => gc.id !== variables.id);
+      });
+      return { previous };
+    },
     onSuccess: () => {
       toast.success("Guest code deleted");
-      void utils.admin.listGuestCodes.invalidate();
     },
-    onError: (error) => {
+    onError: (error, _vars, context) => {
+      if (context?.previous) {
+        utils.admin.listGuestCodes.setData(undefined, context.previous);
+      }
       toast.error(error.message ?? "Failed to delete guest code");
+    },
+    onSettled: () => {
+      void utils.admin.listGuestCodes.invalidate();
     },
   });
 

@@ -12,14 +12,17 @@ export function useGuestEntry() {
   const [submitCode, setSubmitCode] = useState(queryCode);
   const [error, setError] = useState<string | null>(null);
 
-  const { data, isLoading, error: queryError } =
-    api.guest.validateCode.useQuery(
-      { code: submitCode },
-      {
-        enabled: !!submitCode,
-        retry: false,
-      },
-    );
+  const {
+    data,
+    isLoading,
+    error: queryError,
+  } = api.guest.validateCode.useQuery(
+    { code: submitCode },
+    {
+      enabled: !!submitCode,
+      retry: false,
+    },
+  );
 
   useEffect(() => {
     if (data) {

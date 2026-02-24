@@ -1,7 +1,6 @@
 import type { RouterOutputs } from "~/trpc/react";
 
-export type PropertyTenant =
-  RouterOutputs["properties"]["listTenants"][number];
+export type PropertyTenant = RouterOutputs["properties"]["listTenants"][number];
 
 export interface TenantManagerViewProps {
   propertyId: number;

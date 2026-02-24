@@ -66,8 +66,8 @@ export function AppSidebarView({
     <Sidebar>
       <SidebarHeader className="h-14 justify-center border-b px-6">
         <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-primary to-primary/80 shadow-sm">
-            <Building2 className="h-4 w-4 text-primary-foreground" />
+          <div className="from-primary to-primary/80 flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br shadow-sm">
+            <Building2 className="text-primary-foreground h-4 w-4" />
           </div>
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold">Property Manager</span>
@@ -111,11 +111,11 @@ export function AppSidebarView({
 
       <SidebarFooter className="border-t p-4">
         <div className="mb-2 flex justify-end">
-          <AnimatedThemeToggler className="inline-flex items-center justify-center size-8 rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors" />
+          <AnimatedThemeToggler className="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground inline-flex size-8 items-center justify-center rounded-md transition-colors" />
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex w-full items-center gap-3 rounded-xl p-2 text-left text-sm transition-colors duration-200 hover:bg-sidebar-accent">
+            <button className="hover:bg-sidebar-accent flex w-full items-center gap-3 rounded-xl p-2 text-left text-sm transition-colors duration-200">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={userAvatar ?? undefined} />
                 <AvatarFallback className="text-xs">{initials}</AvatarFallback>
@@ -125,7 +125,7 @@ export function AppSidebarView({
                   {userName ?? userEmail}
                 </p>
                 {userName && (
-                  <p className="truncate text-xs text-muted-foreground">
+                  <p className="text-muted-foreground truncate text-xs">
                     {userEmail}
                   </p>
                 )}

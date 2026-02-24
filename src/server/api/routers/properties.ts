@@ -39,19 +39,14 @@ export const propertiesRouter = createTRPCRouter({
       },
     });
 
-    return assignments
-      .map((a) => a.property)
-      .filter((p) => p.isActive);
+    return assignments.map((a) => a.property).filter((p) => p.isActive);
   }),
 
   getById: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
       const property = await ctx.db.query.properties.findFirst({
-        where: and(
-          eq(properties.id, input.id),
-          eq(properties.isActive, true),
-        ),
+        where: and(eq(properties.id, input.id), eq(properties.isActive, true)),
         with: {
           images: { orderBy: (img, { asc }) => [asc(img.sortOrder)] },
           tenants: {
@@ -62,7 +57,10 @@ export const propertiesRouter = createTRPCRouter({
       });
 
       if (!property) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "Property not found" });
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Property not found",
+        });
       }
 
       // Tenant access check
@@ -216,9 +214,7 @@ export const propertiesRouter = createTRPCRouter({
       // Property images bucket is public
       const {
         data: { publicUrl },
-      } = supabaseAdmin.storage
-        .from("property-images")
-        .getPublicUrl("");
+      } = supabaseAdmin.storage.from("property-images").getPublicUrl("");
 
       return { baseUrl: publicUrl };
     }),

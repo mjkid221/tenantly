@@ -41,15 +41,29 @@ export function useTenantManager(propertyId: number) {
   });
 
   const removeMutation = api.properties.removeTenant.useMutation({
-    onSuccess: async () => {
-      await utils.properties.listTenants.invalidate({ propertyId });
-      await utils.properties.getById.invalidate({ id: propertyId });
+    onMutate: async (variables) => {
+      await utils.properties.listTenants.cancel({ propertyId });
+      const previous = utils.properties.listTenants.getData({ propertyId });
+      utils.properties.listTenants.setData({ propertyId }, (old) => {
+        if (!old) return old;
+        return old.filter((t) => t.id !== variables.propertyTenantId);
+      });
+      return { previous };
+    },
+    onSuccess: () => {
       setShowRemoveDialog(false);
       setTenantToRemove(null);
       toast.success("Tenant removed successfully");
     },
-    onError: (error) => {
+    onError: (error, _vars, context) => {
+      if (context?.previous) {
+        utils.properties.listTenants.setData({ propertyId }, context.previous);
+      }
       toast.error(`Failed to remove tenant: ${error.message}`);
+    },
+    onSettled: () => {
+      void utils.properties.listTenants.invalidate({ propertyId });
+      void utils.properties.getById.invalidate({ id: propertyId });
     },
   });
 

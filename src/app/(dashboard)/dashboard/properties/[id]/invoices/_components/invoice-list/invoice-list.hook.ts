@@ -10,10 +10,7 @@ export function useInvoiceList(propertyId: number) {
     );
 
   const { data: invoices, isLoading: isLoadingInvoices } =
-    api.invoices.list.useQuery(
-      { propertyId },
-      { enabled: !isNaN(propertyId) },
-    );
+    api.invoices.list.useQuery({ propertyId }, { enabled: !isNaN(propertyId) });
 
   const { data: me, isLoading: isLoadingMe } = api.user.me.useQuery();
 

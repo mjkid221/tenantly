@@ -34,9 +34,9 @@ export function GuestPropertyViewComponent({
       <div className="flex min-h-[60vh] items-center justify-center">
         <Card className="w-full max-w-md">
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <AlertCircle className="mb-4 h-12 w-12 text-destructive" />
+            <AlertCircle className="text-destructive mb-4 h-12 w-12" />
             <p className="text-lg font-medium">Access Denied</p>
-            <p className="mt-2 text-sm text-muted-foreground">{error}</p>
+            <p className="text-muted-foreground mt-2 text-sm">{error}</p>
             <Button variant="outline" className="mt-6" asChild>
               <Link href="/guest">Try Another Code</Link>
             </Button>
@@ -70,7 +70,7 @@ export function GuestPropertyViewComponent({
         <div className="mt-2 flex items-center gap-2">
           <Badge variant="outline">Guest Access</Badge>
           {validation.expiresAt && (
-            <span className="text-sm text-muted-foreground">
+            <span className="text-muted-foreground text-sm">
               Expires:{" "}
               {new Date(validation.expiresAt).toLocaleDateString("en-AU", {
                 year: "numeric",
@@ -94,7 +94,7 @@ export function GuestPropertyViewComponent({
           <CardContent className="space-y-4">
             <div>
               <h3 className="text-lg font-semibold">{property.name}</h3>
-              <div className="mt-1 flex items-start gap-2 text-muted-foreground">
+              <div className="text-muted-foreground mt-1 flex items-start gap-2">
                 <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0" />
                 <div>
                   <p>{property.addressLine1}</p>
@@ -113,7 +113,7 @@ export function GuestPropertyViewComponent({
               <>
                 <Separator />
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">
+                  <p className="text-muted-foreground text-sm font-medium">
                     Description
                   </p>
                   <p className="mt-1 whitespace-pre-wrap">
@@ -127,7 +127,7 @@ export function GuestPropertyViewComponent({
               <>
                 <Separator />
                 <div>
-                  <p className="mb-3 text-sm font-medium text-muted-foreground">
+                  <p className="text-muted-foreground mb-3 text-sm font-medium">
                     Images
                   </p>
                   <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
@@ -136,11 +136,11 @@ export function GuestPropertyViewComponent({
                         key={image.id}
                         className="overflow-hidden rounded-lg border"
                       >
-                        <div className="flex h-32 items-center justify-center bg-muted">
-                          <Building2 className="h-8 w-8 text-muted-foreground" />
+                        <div className="bg-muted flex h-32 items-center justify-center">
+                          <Building2 className="text-muted-foreground h-8 w-8" />
                         </div>
                         <div className="p-2">
-                          <p className="truncate text-xs text-muted-foreground">
+                          <p className="text-muted-foreground truncate text-xs">
                             {image.fileName}
                           </p>
                         </div>
@@ -170,14 +170,12 @@ export function GuestPropertyViewComponent({
             {contract ? (
               <div className="flex items-center justify-between rounded-lg border p-4">
                 <div>
-                  <p className="font-medium">
-                    {contract.fileName}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-medium">{contract.fileName}</p>
+                  <p className="text-muted-foreground text-sm">
                     Version {contract.version}
                     {contract.notes && ` -- ${contract.notes}`}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     Uploaded{" "}
                     {new Date(contract.createdAt).toLocaleDateString("en-AU", {
                       year: "numeric",
@@ -198,7 +196,7 @@ export function GuestPropertyViewComponent({
                 </Button>
               </div>
             ) : (
-              <p className="py-6 text-center text-sm text-muted-foreground">
+              <p className="text-muted-foreground py-6 text-center text-sm">
                 No contract available for this property.
               </p>
             )}
@@ -210,9 +208,9 @@ export function GuestPropertyViewComponent({
       {allowedSections.length === 0 && (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <AlertCircle className="mb-4 h-12 w-12 text-muted-foreground" />
+            <AlertCircle className="text-muted-foreground mb-4 h-12 w-12" />
             <p className="text-lg font-medium">Limited Access</p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               This access code does not grant access to any property sections.
             </p>
           </CardContent>

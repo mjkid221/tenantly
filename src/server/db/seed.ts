@@ -36,10 +36,7 @@ async function seed() {
   console.log("Adding default invoice categories...");
 
   for (const category of categories) {
-    await db
-      .insert(invoiceCategories)
-      .values(category)
-      .onConflictDoNothing();
+    await db.insert(invoiceCategories).values(category).onConflictDoNothing();
   }
 
   console.log("Seed complete!");

@@ -1,15 +1,12 @@
 import { relations } from "drizzle-orm";
 import { users, admins } from "./users";
-import {
-  properties,
-  propertyImages,
-  propertyTenants,
-} from "./properties";
+import { properties, propertyImages, propertyTenants } from "./properties";
 import { contracts } from "./contracts";
 import {
   invoices,
   invoiceLineItems,
   invoiceCategories,
+  invoiceAttachments,
 } from "./invoices";
 import { payments } from "./payments";
 import { guestAccessCodes } from "./guest-access";
@@ -42,7 +39,7 @@ export const propertyImagesRelations = relations(propertyImages, ({ one }) => ({
 
 export const propertyTenantsRelations = relations(
   propertyTenants,
-  ({ one }) => ({
+  ({ one, many }) => ({
     property: one(properties, {
       fields: [propertyTenants.propertyId],
       references: [properties.id],
@@ -51,6 +48,7 @@ export const propertyTenantsRelations = relations(
       fields: [propertyTenants.userId],
       references: [users.id],
     }),
+    invoices: many(invoices),
   }),
 );
 
@@ -77,11 +75,16 @@ export const invoicesRelations = relations(invoices, ({ one, many }) => ({
     fields: [invoices.propertyId],
     references: [properties.id],
   }),
+  tenant: one(propertyTenants, {
+    fields: [invoices.propertyTenantId],
+    references: [propertyTenants.id],
+  }),
   createdBy: one(users, {
     fields: [invoices.createdByUserId],
     references: [users.id],
   }),
   lineItems: many(invoiceLineItems),
+  attachments: many(invoiceAttachments),
 }));
 
 export const invoiceLineItemsRelations = relations(
@@ -96,6 +99,16 @@ export const invoiceLineItemsRelations = relations(
       references: [invoiceCategories.id],
     }),
     payments: many(payments),
+  }),
+);
+
+export const invoiceAttachmentsRelations = relations(
+  invoiceAttachments,
+  ({ one }) => ({
+    invoice: one(invoices, {
+      fields: [invoiceAttachments.invoiceId],
+      references: [invoices.id],
+    }),
   }),
 );
 

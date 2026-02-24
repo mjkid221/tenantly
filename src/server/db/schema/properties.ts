@@ -2,26 +2,23 @@ import { index, uniqueIndex } from "drizzle-orm/pg-core";
 import { createTable } from "./shared";
 import { users } from "./users";
 
-export const properties = createTable(
-  "property",
-  (d) => ({
-    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
-    name: d.varchar({ length: 256 }).notNull(),
-    addressLine1: d.varchar("address_line_1", { length: 512 }).notNull(),
-    addressLine2: d.varchar("address_line_2", { length: 512 }),
-    city: d.varchar({ length: 256 }).notNull(),
-    state: d.varchar({ length: 256 }),
-    postalCode: d.varchar("postal_code", { length: 20 }),
-    country: d.varchar({ length: 100 }).notNull().default("AU"),
-    description: d.text(),
-    isActive: d.boolean("is_active").notNull().default(true),
-    createdAt: d
-      .timestamp({ withTimezone: true })
-      .$defaultFn(() => new Date())
-      .notNull(),
-    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
-  }),
-);
+export const properties = createTable("property", (d) => ({
+  id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+  name: d.varchar({ length: 256 }).notNull(),
+  addressLine1: d.varchar("address_line_1", { length: 512 }).notNull(),
+  addressLine2: d.varchar("address_line_2", { length: 512 }),
+  city: d.varchar({ length: 256 }).notNull(),
+  state: d.varchar({ length: 256 }),
+  postalCode: d.varchar("postal_code", { length: 20 }),
+  country: d.varchar({ length: 100 }).notNull().default("AU"),
+  description: d.text(),
+  isActive: d.boolean("is_active").notNull().default(true),
+  createdAt: d
+    .timestamp({ withTimezone: true })
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+}));
 
 export const propertyImages = createTable(
   "property_image",

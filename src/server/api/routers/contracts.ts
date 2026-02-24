@@ -52,11 +52,13 @@ export const contractsRouter = createTRPCRouter({
         }
       }
 
-      return ctx.db.query.contracts.findFirst({
-        where: eq(contracts.propertyId, input.propertyId),
-        with: { uploadedBy: true },
-        orderBy: (c, { desc }) => [desc(c.version)],
-      }) ?? null;
+      return (
+        ctx.db.query.contracts.findFirst({
+          where: eq(contracts.propertyId, input.propertyId),
+          with: { uploadedBy: true },
+          orderBy: (c, { desc }) => [desc(c.version)],
+        }) ?? null
+      );
     }),
 
   getById: protectedProcedure

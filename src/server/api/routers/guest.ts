@@ -66,9 +66,7 @@ export const guestRouter = createTRPCRouter({
 
       validateGuestCode(guestCode);
 
-      if (
-        !guestCode.allowedSections?.includes("property_details")
-      ) {
+      if (!guestCode.allowedSections?.includes("property_details")) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "Access to property details is not allowed with this code",

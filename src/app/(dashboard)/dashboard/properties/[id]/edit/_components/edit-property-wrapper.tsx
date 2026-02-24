@@ -50,7 +50,7 @@ export function EditPropertyWrapper({ propertyId }: EditPropertyWrapperProps) {
 
   if (!property) {
     return (
-      <div className="py-8 text-center text-muted-foreground">
+      <div className="text-muted-foreground py-8 text-center">
         Property not found.
       </div>
     );

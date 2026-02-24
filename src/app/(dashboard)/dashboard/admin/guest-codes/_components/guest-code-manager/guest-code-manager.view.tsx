@@ -1,14 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Plus,
-  Key,
-  Copy,
-  Trash2,
-  ToggleLeft,
-  ToggleRight,
-} from "lucide-react";
+import { Plus, Key, Copy, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -90,9 +83,7 @@ export function GuestCodeManagerView({
     onCreateGuestCode({
       propertyId: Number(formPropertyId),
       label: formLabel,
-      expiresAt: formExpiresAt
-        ? new Date(formExpiresAt).toISOString()
-        : "",
+      expiresAt: formExpiresAt ? new Date(formExpiresAt).toISOString() : "",
       allowedSections: formSections,
     });
     setFormPropertyId("");
@@ -112,275 +103,281 @@ export function GuestCodeManagerView({
   return (
     <div className="space-y-6">
       <BlurFade delay={0.05}>
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Guest Codes</h1>
-          <p className="text-muted-foreground">
-            Manage guest access codes for sharing property information.
-          </p>
-        </div>
-        <Dialog
-          open={isCreateDialogOpen}
-          onOpenChange={onCreateDialogOpenChange}
-        >
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Create Code
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create Guest Code</DialogTitle>
-              <DialogDescription>
-                Generate a new access code for sharing property information with
-                guests.
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="gcProperty">Property</Label>
-                <Select
-                  value={formPropertyId}
-                  onValueChange={setFormPropertyId}
-                >
-                  <SelectTrigger id="gcProperty">
-                    <SelectValue placeholder="Select property" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {propertiesLoading ? (
-                      <SelectItem value="loading" disabled>
-                        Loading...
-                      </SelectItem>
-                    ) : (
-                      properties.map((p) => (
-                        <SelectItem key={p.id} value={String(p.id)}>
-                          {p.name}
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="gcLabel">Label (optional)</Label>
-                <Input
-                  id="gcLabel"
-                  placeholder="e.g. Agent viewing code"
-                  value={formLabel}
-                  onChange={(e) => setFormLabel(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="gcExpires">Expires At (optional)</Label>
-                <Input
-                  id="gcExpires"
-                  type="datetime-local"
-                  value={formExpiresAt}
-                  onChange={(e) => setFormExpiresAt(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Allowed Sections</Label>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Guest Codes</h1>
+            <p className="text-muted-foreground">
+              Manage guest access codes for sharing property information.
+            </p>
+          </div>
+          <Dialog
+            open={isCreateDialogOpen}
+            onOpenChange={onCreateDialogOpenChange}
+          >
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Code
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create Guest Code</DialogTitle>
+                <DialogDescription>
+                  Generate a new access code for sharing property information
+                  with guests.
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  {ALLOWED_SECTIONS.map((section) => (
-                    <label
-                      key={section.value}
-                      className="flex items-center gap-2 text-sm"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={formSections.includes(section.value)}
-                        onChange={() => toggleSection(section.value)}
-                        className="h-4 w-4 rounded border-gray-300"
-                      />
-                      {section.label}
-                    </label>
-                  ))}
+                  <Label htmlFor="gcProperty">Property</Label>
+                  <Select
+                    value={formPropertyId}
+                    onValueChange={setFormPropertyId}
+                  >
+                    <SelectTrigger id="gcProperty">
+                      <SelectValue placeholder="Select property" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {propertiesLoading ? (
+                        <SelectItem value="loading" disabled>
+                          Loading...
+                        </SelectItem>
+                      ) : (
+                        properties.map((p) => (
+                          <SelectItem key={p.id} value={String(p.id)}>
+                            {p.name}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
                 </div>
-              </div>
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => onCreateDialogOpenChange(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isCreating || !formPropertyId}
-                >
-                  {isCreating ? "Creating..." : "Create Code"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
+                <div className="space-y-2">
+                  <Label htmlFor="gcLabel">Label (optional)</Label>
+                  <Input
+                    id="gcLabel"
+                    placeholder="e.g. Agent viewing code"
+                    value={formLabel}
+                    onChange={(e) => setFormLabel(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="gcExpires">Expires At (optional)</Label>
+                  <Input
+                    id="gcExpires"
+                    type="datetime-local"
+                    value={formExpiresAt}
+                    onChange={(e) => setFormExpiresAt(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Allowed Sections</Label>
+                  <div className="space-y-2">
+                    {ALLOWED_SECTIONS.map((section) => (
+                      <label
+                        key={section.value}
+                        className="flex items-center gap-2 text-sm"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={formSections.includes(section.value)}
+                          onChange={() => toggleSection(section.value)}
+                          className="h-4 w-4 rounded border-gray-300"
+                        />
+                        {section.label}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => onCreateDialogOpenChange(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={isCreating || !formPropertyId}
+                  >
+                    {isCreating ? "Creating..." : "Create Code"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </BlurFade>
 
       <BlurFade delay={0.1}>
-      <Card className="rounded-2xl">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Key className="h-5 w-5" />
-            Guest Access Codes
-          </CardTitle>
-          <CardDescription>
-            {guestCodes.length} code{guestCodes.length !== 1 ? "s" : ""}{" "}
-            created
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="space-y-3">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <Skeleton key={i} className="h-12 w-full" />
-              ))}
-            </div>
-          ) : guestCodes.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 text-center">
-              <div className="rounded-2xl bg-muted p-4">
-                <Key className="h-8 w-8 text-muted-foreground/40" />
+        <Card className="rounded-2xl">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Key className="h-5 w-5" />
+              Guest Access Codes
+            </CardTitle>
+            <CardDescription>
+              {guestCodes.length} code{guestCodes.length !== 1 ? "s" : ""}{" "}
+              created
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-12 w-full" />
+                ))}
               </div>
-              <p className="mt-4 text-lg font-medium">No guest codes yet</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Create your first guest code to share property access.
-              </p>
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Code</TableHead>
-                  <TableHead>Property</TableHead>
-                  <TableHead>Label</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Expires At</TableHead>
-                  <TableHead>Created At</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {guestCodes.map((gc) => {
-                  const isExpired =
-                    gc.expiresAt && new Date(gc.expiresAt) < new Date();
-                  return (
-                    <TableRow key={gc.id}>
-                      <TableCell>
-                        <code className="rounded bg-muted px-2 py-0.5 text-sm">
-                          {gc.code}
-                        </code>
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {gc.property.name}
-                      </TableCell>
-                      <TableCell>{gc.label ?? "--"}</TableCell>
-                      <TableCell>
-                        {isExpired ? (
-                          <Badge variant="destructive">Expired</Badge>
-                        ) : gc.isEnabled ? (
-                          <Badge variant="secondary" className="gap-1.5 rounded-full">
-                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                            Enabled
-                          </Badge>
-                        ) : (
-                          <Badge variant="secondary" className="gap-1.5 rounded-full">
-                            <span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
-                            Disabled
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {gc.expiresAt
-                          ? new Date(gc.expiresAt).toLocaleString("en-AU", {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })
-                          : "Never"}
-                      </TableCell>
-                      <TableCell>
-                        {new Date(gc.createdAt).toLocaleDateString("en-AU", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onCopyUrl(gc.code)}
-                            title="Copy guest URL"
-                          >
-                            <Copy className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            disabled={isToggling}
-                            onClick={() =>
-                              onToggleEnabled(gc.id, !gc.isEnabled)
-                            }
-                            title={
-                              gc.isEnabled ? "Disable code" : "Enable code"
-                            }
-                          >
-                            {gc.isEnabled ? (
-                              <ToggleRight className="h-4 w-4 text-green-600" />
-                            ) : (
-                              <ToggleLeft className="h-4 w-4 text-muted-foreground" />
-                            )}
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-destructive hover:text-destructive"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  Delete guest code?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This will permanently delete the guest access
-                                  code <strong>{gc.code}</strong>. Anyone using
-                                  this code will no longer have access. This
-                                  action cannot be undone.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => onDeleteGuestCode(gc.id)}
-                                  disabled={isDeleting}
-                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            ) : guestCodes.length === 0 ? (
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 text-center">
+                <div className="bg-muted rounded-2xl p-4">
+                  <Key className="text-muted-foreground/40 h-8 w-8" />
+                </div>
+                <p className="mt-4 text-lg font-medium">No guest codes yet</p>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  Create your first guest code to share property access.
+                </p>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Code</TableHead>
+                    <TableHead>Property</TableHead>
+                    <TableHead>Label</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Expires At</TableHead>
+                    <TableHead>Created At</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {guestCodes.map((gc) => {
+                    const isExpired =
+                      gc.expiresAt && new Date(gc.expiresAt) < new Date();
+                    return (
+                      <TableRow key={gc.id}>
+                        <TableCell>
+                          <code className="bg-muted rounded px-2 py-0.5 text-sm">
+                            {gc.code}
+                          </code>
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {gc.property.name}
+                        </TableCell>
+                        <TableCell>{gc.label ?? "--"}</TableCell>
+                        <TableCell>
+                          {isExpired ? (
+                            <Badge variant="destructive">Expired</Badge>
+                          ) : gc.isEnabled ? (
+                            <Badge
+                              variant="secondary"
+                              className="gap-1.5 rounded-full"
+                            >
+                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                              Enabled
+                            </Badge>
+                          ) : (
+                            <Badge
+                              variant="secondary"
+                              className="gap-1.5 rounded-full"
+                            >
+                              <span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
+                              Disabled
+                            </Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {gc.expiresAt
+                            ? new Date(gc.expiresAt).toLocaleString("en-AU", {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })
+                            : "Never"}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(gc.createdAt).toLocaleDateString("en-AU", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => onCopyUrl(gc.code)}
+                              title="Copy guest URL"
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              disabled={isToggling}
+                              onClick={() =>
+                                onToggleEnabled(gc.id, !gc.isEnabled)
+                              }
+                              title={
+                                gc.isEnabled ? "Disable code" : "Enable code"
+                              }
+                            >
+                              {gc.isEnabled ? (
+                                <ToggleRight className="h-4 w-4 text-green-600" />
+                              ) : (
+                                <ToggleLeft className="text-muted-foreground h-4 w-4" />
+                              )}
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-destructive hover:text-destructive"
                                 >
-                                  {isDeleting ? "Deleting..." : "Delete"}
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    Delete guest code?
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This will permanently delete the guest
+                                    access code <strong>{gc.code}</strong>.
+                                    Anyone using this code will no longer have
+                                    access. This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => onDeleteGuestCode(gc.id)}
+                                    disabled={isDeleting}
+                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  >
+                                    {isDeleting ? "Deleting..." : "Delete"}
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
       </BlurFade>
     </div>
   );

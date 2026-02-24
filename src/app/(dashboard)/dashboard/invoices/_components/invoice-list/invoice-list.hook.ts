@@ -3,10 +3,15 @@
 import { useState } from "react";
 import { api } from "~/trpc/react";
 import { toast } from "sonner";
-import type { CreateInvoiceFormValues, InvoiceStatus } from "./invoice-list.types";
+import type {
+  CreateInvoiceFormValues,
+  InvoiceStatus,
+} from "./invoice-list.types";
 
 export function useInvoiceList() {
-  const [statusFilter, setStatusFilter] = useState<InvoiceStatus | "all">("all");
+  const [statusFilter, setStatusFilter] = useState<InvoiceStatus | "all">(
+    "all",
+  );
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const { data: user } = api.user.me.useQuery();
@@ -36,6 +41,7 @@ export function useInvoiceList() {
   const onCreateInvoice = (values: CreateInvoiceFormValues) => {
     createInvoice.mutate({
       propertyId: values.propertyId,
+      propertyTenantId: values.propertyTenantId,
       billingPeriodStart: values.billingPeriodStart,
       billingPeriodEnd: values.billingPeriodEnd,
       label: values.label || undefined,
@@ -50,7 +56,17 @@ export function useInvoiceList() {
     onStatusFilterChange: setStatusFilter,
     isCreateDialogOpen,
     onCreateDialogOpenChange: setIsCreateDialogOpen,
-    properties: (properties ?? []).map((p) => ({ id: p.id, name: p.name })),
+    properties: (properties ?? []).map((p) => ({
+      id: p.id,
+      name: p.name,
+      tenants: p.tenants
+        .filter((t) => t.isActive)
+        .map((t) => ({
+          id: t.id,
+          email: t.email,
+          fullName: t.user?.fullName ?? null,
+        })),
+    })),
     propertiesLoading,
     onCreateInvoice,
     isCreating: createInvoice.isPending,

@@ -134,7 +134,7 @@ function UploadDialog({
               }}
             />
             {selectedFile && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Selected: {selectedFile.name} (
                 {(selectedFile.size / 1024).toFixed(1)} KB)
               </p>
@@ -143,7 +143,7 @@ function UploadDialog({
           <div className="space-y-2">
             <Label>Notes (optional)</Label>
             <textarea
-              className="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[60px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
               placeholder="e.g. Updated lease terms for 2025"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -237,11 +237,11 @@ export function ContractListView({
       {contracts.length === 0 ? (
         <BlurFade delay={0.15}>
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 text-center">
-            <div className="rounded-2xl bg-muted p-4">
-              <FileText className="h-8 w-8 text-muted-foreground/40" />
+            <div className="bg-muted rounded-2xl p-4">
+              <FileText className="text-muted-foreground/40 h-8 w-8" />
             </div>
             <h3 className="mt-4 text-lg font-semibold">No contracts yet</h3>
-            <p className="mt-1 mb-4 text-sm text-muted-foreground">
+            <p className="text-muted-foreground mt-1 mb-4 text-sm">
               {isAdmin
                 ? "Upload the first lease contract for this property."
                 : "No contracts have been uploaded yet."}
@@ -256,176 +256,175 @@ export function ContractListView({
         </BlurFade>
       ) : (
         <BlurFade delay={0.15}>
-        <div className="space-y-4">
-          {/* Version Selector */}
-          <div className="flex items-center gap-4">
-            <Label>Version</Label>
-            <Select
-              value={selectedContractId?.toString() ?? ""}
-              onValueChange={(val) => onSelectContract(Number(val))}
-            >
-              <SelectTrigger className="w-70">
-                <SelectValue placeholder="Select contract version" />
-              </SelectTrigger>
-              <SelectContent>
-                {contracts.map((contract) => (
-                  <SelectItem
-                    key={contract.id}
-                    value={contract.id.toString()}
-                  >
-                    Version {contract.version} - {contract.fileName}
-                    {contract.id === contracts[0]?.id && " (Latest)"}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <div className="space-y-4">
+            {/* Version Selector */}
+            <div className="flex items-center gap-4">
+              <Label>Version</Label>
+              <Select
+                value={selectedContractId?.toString() ?? ""}
+                onValueChange={(val) => onSelectContract(Number(val))}
+              >
+                <SelectTrigger className="w-70">
+                  <SelectValue placeholder="Select contract version" />
+                </SelectTrigger>
+                <SelectContent>
+                  {contracts.map((contract) => (
+                    <SelectItem
+                      key={contract.id}
+                      value={contract.id.toString()}
+                    >
+                      Version {contract.version} - {contract.fileName}
+                      {contract.id === contracts[0]?.id && " (Latest)"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Selected Contract Details */}
-          {selectedContract && (
-            <Card className="rounded-2xl">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <FileText className="h-5 w-5" />
-                      {selectedContract.fileName}
-                    </CardTitle>
-                    <CardDescription>
-                      Version {selectedContract.version}
-                      {selectedContract.id === contracts[0]?.id && (
-                        <Badge variant="secondary" className="ml-2">
-                          Latest
-                        </Badge>
-                      )}
-                    </CardDescription>
+            {/* Selected Contract Details */}
+            {selectedContract && (
+              <Card className="rounded-2xl">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <FileText className="h-5 w-5" />
+                        {selectedContract.fileName}
+                      </CardTitle>
+                      <CardDescription>
+                        Version {selectedContract.version}
+                        {selectedContract.id === contracts[0]?.id && (
+                          <Badge variant="secondary" className="ml-2">
+                            Latest
+                          </Badge>
+                        )}
+                      </CardDescription>
+                    </div>
+                    {downloadUrl && (
+                      <Button asChild size="sm">
+                        <a
+                          href={downloadUrl}
+                          download={downloadFileName ?? "contract.pdf"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Download className="mr-2 h-4 w-4" />
+                          Download
+                        </a>
+                      </Button>
+                    )}
+                    {isLoadingDownload && (
+                      <Button size="sm" disabled>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Loading...
+                      </Button>
+                    )}
                   </div>
-                  {downloadUrl && (
-                    <Button asChild size="sm">
-                      <a
-                        href={downloadUrl}
-                        download={downloadFileName ?? "contract.pdf"}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <Download className="mr-2 h-4 w-4" />
-                        Download
-                      </a>
-                    </Button>
-                  )}
-                  {isLoadingDownload && (
-                    <Button size="sm" disabled>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Loading...
-                    </Button>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid gap-4 text-sm sm:grid-cols-2">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Calendar className="h-4 w-4" />
-                    <span>
-                      Uploaded:{" "}
-                      {new Date(selectedContract.createdAt).toLocaleDateString(
-                        "en-AU",
-                        {
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="grid gap-4 text-sm sm:grid-cols-2">
+                    <div className="text-muted-foreground flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      <span>
+                        Uploaded:{" "}
+                        {new Date(
+                          selectedContract.createdAt,
+                        ).toLocaleDateString("en-AU", {
                           day: "numeric",
                           month: "short",
                           year: "numeric",
-                        },
-                      )}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <User className="h-4 w-4" />
-                    <span>
-                      By:{" "}
-                      {selectedContract.uploadedBy.fullName ??
-                        selectedContract.uploadedBy.email}
-                    </span>
-                  </div>
-                </div>
-                {selectedContract.sizeBytes && (
-                  <p className="text-sm text-muted-foreground">
-                    File size: {(selectedContract.sizeBytes / 1024).toFixed(1)}{" "}
-                    KB
-                  </p>
-                )}
-                {selectedContract.notes && (
-                  <>
-                    <Separator />
-                    <div>
-                      <p className="text-sm font-medium">Notes</p>
-                      <p className="text-sm text-muted-foreground">
-                        {selectedContract.notes}
-                      </p>
+                        })}
+                      </span>
                     </div>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* PDF Viewer */}
-          {selectedContract && downloadUrl && (
-            <Card className="overflow-hidden rounded-2xl">
-              <CardContent className="p-0">
-                <iframe
-                  src={downloadUrl}
-                  title={selectedContract.fileName}
-                  className="h-[85vh] w-full border-0"
-                />
-              </CardContent>
-            </Card>
-          )}
-
-          {/* All Versions List */}
-          <Card className="rounded-2xl">
-            <CardHeader>
-              <CardTitle>All Versions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {contracts.map((contract) => (
-                  <div
-                    key={contract.id}
-                    className={`flex items-center justify-between rounded-xl border p-3 transition-colors ${
-                      contract.id === selectedContractId
-                        ? "border-primary bg-primary/5"
-                        : "hover:bg-muted/50"
-                    }`}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => onSelectContract(contract.id)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        onSelectContract(contract.id);
-                      }
-                    }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <FileText className="h-5 w-5 text-muted-foreground" />
+                    <div className="text-muted-foreground flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      <span>
+                        By:{" "}
+                        {selectedContract.uploadedBy.fullName ??
+                          selectedContract.uploadedBy.email}
+                      </span>
+                    </div>
+                  </div>
+                  {selectedContract.sizeBytes && (
+                    <p className="text-muted-foreground text-sm">
+                      File size:{" "}
+                      {(selectedContract.sizeBytes / 1024).toFixed(1)} KB
+                    </p>
+                  )}
+                  {selectedContract.notes && (
+                    <>
+                      <Separator />
                       <div>
-                        <p className="text-sm font-medium">
-                          v{contract.version} - {contract.fileName}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(contract.createdAt).toLocaleDateString(
-                            "en-AU",
-                          )}
+                        <p className="text-sm font-medium">Notes</p>
+                        <p className="text-muted-foreground text-sm">
+                          {selectedContract.notes}
                         </p>
                       </div>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* PDF Viewer */}
+            {selectedContract && downloadUrl && (
+              <Card className="overflow-hidden rounded-2xl">
+                <CardContent className="p-0">
+                  <iframe
+                    src={downloadUrl}
+                    title={selectedContract.fileName}
+                    className="h-[85vh] w-full border-0"
+                  />
+                </CardContent>
+              </Card>
+            )}
+
+            {/* All Versions List */}
+            <Card className="rounded-2xl">
+              <CardHeader>
+                <CardTitle>All Versions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {contracts.map((contract) => (
+                    <div
+                      key={contract.id}
+                      className={`flex items-center justify-between rounded-xl border p-3 transition-colors ${
+                        contract.id === selectedContractId
+                          ? "border-primary bg-primary/5"
+                          : "hover:bg-muted/50"
+                      }`}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => onSelectContract(contract.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          onSelectContract(contract.id);
+                        }
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <FileText className="text-muted-foreground h-5 w-5" />
+                        <div>
+                          <p className="text-sm font-medium">
+                            v{contract.version} - {contract.fileName}
+                          </p>
+                          <p className="text-muted-foreground text-xs">
+                            {new Date(contract.createdAt).toLocaleDateString(
+                              "en-AU",
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                      {contract.id === contracts[0]?.id && (
+                        <Badge variant="secondary">Latest</Badge>
+                      )}
                     </div>
-                    {contract.id === contracts[0]?.id && (
-                      <Badge variant="secondary">Latest</Badge>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </BlurFade>
       )}
 

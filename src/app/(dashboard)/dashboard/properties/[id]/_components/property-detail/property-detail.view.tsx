@@ -107,11 +107,11 @@ export function PropertyDetailView({
   if (!property) {
     return (
       <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-20">
-        <div className="rounded-2xl bg-muted p-4">
-          <Building2 className="h-8 w-8 text-muted-foreground/40" />
+        <div className="bg-muted rounded-2xl p-4">
+          <Building2 className="text-muted-foreground/40 h-8 w-8" />
         </div>
         <h3 className="mt-4 text-lg font-semibold">Property not found</h3>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="text-muted-foreground mt-1 text-sm">
           The property you are looking for does not exist or you do not have
           access.
         </p>
@@ -150,7 +150,7 @@ export function PropertyDetailView({
             <h1 className="text-3xl font-bold tracking-tight">
               {property.name}
             </h1>
-            <div className="mt-1 flex items-center gap-2 text-muted-foreground">
+            <div className="text-muted-foreground mt-1 flex items-center gap-2">
               <MapPin className="h-4 w-4" />
               <span>
                 {property.addressLine1}
@@ -192,7 +192,7 @@ export function PropertyDetailView({
       {/* Hero Image */}
       {heroImage && imageBaseUrl ? (
         <BlurFade delay={0.15}>
-          <div className="relative aspect-21/9 w-full overflow-hidden rounded-2xl bg-muted">
+          <div className="bg-muted relative aspect-21/9 w-full overflow-hidden rounded-2xl">
             <img
               src={`${imageBaseUrl}${heroImage.storagePath}`}
               alt={property.name}
@@ -204,7 +204,7 @@ export function PropertyDetailView({
                 type="button"
                 onClick={() => onRemoveImage(heroImage.id)}
                 disabled={isRemovingImage}
-                className="absolute right-3 top-3 rounded-full bg-black/50 p-1.5 text-white transition-opacity hover:bg-black/70 disabled:opacity-50"
+                className="absolute top-3 right-3 rounded-full bg-black/50 p-1.5 text-white transition-opacity hover:bg-black/70 disabled:opacity-50"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -215,8 +215,8 @@ export function PropertyDetailView({
         <BlurFade delay={0.15}>
           <Card className="rounded-2xl">
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <ImageIcon className="mb-2 h-8 w-8 text-muted-foreground/30" />
-              <p className="text-sm text-muted-foreground">
+              <ImageIcon className="text-muted-foreground/30 mb-2 h-8 w-8" />
+              <p className="text-muted-foreground text-sm">
                 No images uploaded yet
               </p>
             </CardContent>
@@ -243,7 +243,7 @@ export function PropertyDetailView({
                     type="button"
                     onClick={() => onRemoveImage(image.id)}
                     disabled={isRemovingImage}
-                    className="absolute right-2 top-2 rounded-full bg-black/50 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 disabled:opacity-50"
+                    className="absolute top-2 right-2 rounded-full bg-black/50 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 disabled:opacity-50"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -271,7 +271,7 @@ export function PropertyDetailView({
                       "0"
                     )}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     Active Tenants
                   </p>
                 </div>
@@ -292,7 +292,7 @@ export function PropertyDetailView({
                       "0"
                     )}
                   </p>
-                  <p className="text-sm text-muted-foreground">Contracts</p>
+                  <p className="text-muted-foreground text-sm">Contracts</p>
                 </div>
               </div>
             </MagicCard>
@@ -311,7 +311,7 @@ export function PropertyDetailView({
                       "0"
                     )}
                   </p>
-                  <p className="text-sm text-muted-foreground">Invoices</p>
+                  <p className="text-muted-foreground text-sm">Invoices</p>
                 </div>
               </div>
             </MagicCard>
@@ -342,13 +342,13 @@ export function PropertyDetailView({
               <CardContent className="p-5">
                 {contracts.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-8 text-center">
-                    <div className="rounded-2xl bg-muted p-4">
-                      <FileText className="h-8 w-8 text-muted-foreground/40" />
+                    <div className="bg-muted rounded-2xl p-4">
+                      <FileText className="text-muted-foreground/40 h-8 w-8" />
                     </div>
                     <h3 className="mt-4 text-sm font-semibold">
                       No contracts yet
                     </h3>
-                    <p className="mt-1 text-sm text-muted-foreground">
+                    <p className="text-muted-foreground mt-1 text-sm">
                       Upload a lease contract to get started.
                     </p>
                   </div>
@@ -359,20 +359,21 @@ export function PropertyDetailView({
                       return (
                         <div className="flex items-center justify-between rounded-xl border p-3">
                           <div className="flex items-center gap-3">
-                            <FileText className="h-5 w-5 text-muted-foreground" />
+                            <FileText className="text-muted-foreground h-5 w-5" />
                             <div>
                               <p className="text-sm font-medium">
                                 {latest.fileName}
                               </p>
-                              <p className="text-xs text-muted-foreground">
+                              <p className="text-muted-foreground text-xs">
                                 Version {latest.version} &middot;{" "}
-                                {new Date(
-                                  latest.createdAt,
-                                ).toLocaleDateString("en-AU", {
-                                  day: "numeric",
-                                  month: "short",
-                                  year: "numeric",
-                                })}
+                                {new Date(latest.createdAt).toLocaleDateString(
+                                  "en-AU",
+                                  {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric",
+                                  },
+                                )}
                               </p>
                             </div>
                           </div>
@@ -401,13 +402,13 @@ export function PropertyDetailView({
               <CardContent className="p-5">
                 {invoices.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-8 text-center">
-                    <div className="rounded-2xl bg-muted p-4">
-                      <Receipt className="h-8 w-8 text-muted-foreground/40" />
+                    <div className="bg-muted rounded-2xl p-4">
+                      <Receipt className="text-muted-foreground/40 h-8 w-8" />
                     </div>
                     <h3 className="mt-4 text-sm font-semibold">
                       No invoices yet
                     </h3>
-                    <p className="mt-1 text-sm text-muted-foreground">
+                    <p className="text-muted-foreground mt-1 text-sm">
                       Create an invoice to get started.
                     </p>
                   </div>
@@ -424,7 +425,7 @@ export function PropertyDetailView({
                           className="flex items-center justify-between rounded-xl border p-3"
                         >
                           <div className="flex items-center gap-3">
-                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                            <Calendar className="text-muted-foreground h-4 w-4" />
                             <div>
                               <p className="text-sm font-medium">
                                 {invoice.label ??
@@ -435,7 +436,7 @@ export function PropertyDetailView({
                                     year: "numeric",
                                   })}
                               </p>
-                              <p className="text-xs text-muted-foreground">
+                              <p className="text-muted-foreground text-xs">
                                 {formatCurrency(tenantCharge)}
                               </p>
                             </div>
@@ -480,13 +481,13 @@ export function PropertyDetailView({
               <CardContent className="p-5">
                 {activeTenants.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-8 text-center">
-                    <div className="rounded-2xl bg-muted p-4">
-                      <Users className="h-8 w-8 text-muted-foreground/40" />
+                    <div className="bg-muted rounded-2xl p-4">
+                      <Users className="text-muted-foreground/40 h-8 w-8" />
                     </div>
                     <h3 className="mt-4 text-sm font-semibold">
                       No active tenants
                     </h3>
-                    <p className="mt-1 text-sm text-muted-foreground">
+                    <p className="text-muted-foreground mt-1 text-sm">
                       Assign tenants to this property.
                     </p>
                   </div>
@@ -495,10 +496,10 @@ export function PropertyDetailView({
                     {activeTenants.map((tenant) => (
                       <div
                         key={tenant.id}
-                        className="flex items-center justify-between rounded-xl p-2 transition-colors hover:bg-accent/50"
+                        className="hover:bg-accent/50 flex items-center justify-between rounded-xl p-2 transition-colors"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-sm font-medium text-primary">
+                          <div className="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium">
                             {tenant.user?.fullName?.[0]?.toUpperCase() ??
                               tenant.email[0]?.toUpperCase()}
                           </div>
@@ -507,7 +508,7 @@ export function PropertyDetailView({
                               {tenant.user?.fullName ?? tenant.email}
                             </p>
                             {tenant.user?.fullName && (
-                              <p className="text-xs text-muted-foreground">
+                              <p className="text-muted-foreground text-xs">
                                 {tenant.email}
                               </p>
                             )}
@@ -547,8 +548,8 @@ export function PropertyDetailView({
             <AlertDialogTitle>Delete Property</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete &quot;{property.name}&quot;? This
-              action will deactivate the property and it will no longer appear in
-              listings.
+              action will deactivate the property and it will no longer appear
+              in listings.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

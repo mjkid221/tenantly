@@ -24,7 +24,7 @@ function PropertyCard({
   return (
     <Link href={`/dashboard/properties/${property.id}`}>
       <MagicCard className="overflow-hidden rounded-2xl" gradientOpacity={0.1}>
-        <div className="relative aspect-video w-full overflow-hidden bg-muted">
+        <div className="bg-muted relative aspect-video w-full overflow-hidden">
           {firstImage && imageBaseUrl ? (
             <img
               src={`${imageBaseUrl}${firstImage.storagePath}`}
@@ -33,14 +33,16 @@ function PropertyCard({
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
-              <Building2 className="h-12 w-12 text-muted-foreground/30" />
+              <Building2 className="text-muted-foreground/30 h-12 w-12" />
             </div>
           )}
           <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-black/25 to-transparent" />
         </div>
         <div className="p-4">
-          <h3 className="line-clamp-1 text-lg font-semibold">{property.name}</h3>
-          <div className="mt-1.5 flex items-start gap-2 text-sm text-muted-foreground">
+          <h3 className="line-clamp-1 text-lg font-semibold">
+            {property.name}
+          </h3>
+          <div className="text-muted-foreground mt-1.5 flex items-start gap-2 text-sm">
             <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
             <span className="line-clamp-1">
               {property.addressLine1}
@@ -52,7 +54,9 @@ function PropertyCard({
           </div>
           <div className="mt-3">
             <Badge variant="secondary" className="gap-1.5 rounded-full">
-              <span className={`h-1.5 w-1.5 rounded-full ${activeTenants.length > 0 ? "bg-emerald-500" : "bg-zinc-400"}`} />
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${activeTenants.length > 0 ? "bg-emerald-500" : "bg-zinc-400"}`}
+              />
               {activeTenants.length}{" "}
               {activeTenants.length === 1 ? "tenant" : "tenants"}
             </Badge>
@@ -69,7 +73,7 @@ function LoadingSkeleton() {
       {Array.from({ length: 6 }).map((_, i) => (
         <Card key={i} className="overflow-hidden rounded-2xl">
           <Skeleton className="aspect-video w-full" />
-          <div className="p-4 space-y-3">
+          <div className="space-y-3 p-4">
             <Skeleton className="h-6 w-3/4" />
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-5 w-20 rounded-full" />
@@ -83,11 +87,11 @@ function LoadingSkeleton() {
 function EmptyState({ isAdmin }: { isAdmin: boolean }) {
   return (
     <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-20">
-      <div className="rounded-2xl bg-muted p-4">
-        <Building2 className="h-8 w-8 text-muted-foreground/40" />
+      <div className="bg-muted rounded-2xl p-4">
+        <Building2 className="text-muted-foreground/40 h-8 w-8" />
       </div>
       <h3 className="mt-4 text-lg font-semibold">No properties found</h3>
-      <p className="mt-1 max-w-sm text-center text-sm text-muted-foreground">
+      <p className="text-muted-foreground mt-1 max-w-sm text-center text-sm">
         {isAdmin
           ? "Get started by adding your first property."
           : "No properties have been assigned to you yet."}
@@ -126,7 +130,7 @@ export function PropertyListView({
           </div>
           <div className="flex items-center gap-3">
             <div className="relative max-w-sm flex-1 sm:w-64">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
               <Input
                 placeholder="Search properties..."
                 value={searchQuery}
@@ -154,10 +158,7 @@ export function PropertyListView({
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {properties.map((property, index) => (
             <BlurFade key={property.id} delay={0.05 + index * 0.05} inView>
-              <PropertyCard
-                property={property}
-                imageBaseUrl={imageBaseUrl}
-              />
+              <PropertyCard property={property} imageBaseUrl={imageBaseUrl} />
             </BlurFade>
           ))}
         </div>

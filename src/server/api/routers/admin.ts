@@ -76,9 +76,7 @@ export const adminRouter = createTRPCRouter({
         propertyId: z.number(),
         label: z.string().max(256).optional(),
         expiresAt: z.string().datetime().optional(),
-        allowedSections: z
-          .array(z.string())
-          .default(["property_details"]),
+        allowedSections: z.array(z.string()).default(["property_details"]),
       }),
     )
     .mutation(async ({ ctx, input }) => {

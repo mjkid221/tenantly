@@ -86,9 +86,7 @@ export function SettingsFormView({
               <User className="h-5 w-5" />
               Profile
             </CardTitle>
-            <CardDescription>
-              Update your personal information.
-            </CardDescription>
+            <CardDescription>Update your personal information.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -99,9 +97,9 @@ export function SettingsFormView({
                     <img
                       src={avatarUrl}
                       alt="Avatar"
-                      className="h-16 w-16 rounded-full object-cover ring-2 ring-border"
+                      className="ring-border h-16 w-16 rounded-full object-cover ring-2"
                     />
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground text-sm">
                       Your avatar is synced from your authentication provider.
                     </p>
                   </div>
@@ -123,7 +121,7 @@ export function SettingsFormView({
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input id="email" value={email} disabled readOnly />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   Email cannot be changed. It is managed by your authentication
                   provider.
                 </p>

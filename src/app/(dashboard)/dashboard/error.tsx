@@ -17,7 +17,7 @@ export default function DashboardError({
           <CardTitle>Something went wrong</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {error.message || "An unexpected error occurred."}
           </p>
           <Button onClick={reset}>Try again</Button>

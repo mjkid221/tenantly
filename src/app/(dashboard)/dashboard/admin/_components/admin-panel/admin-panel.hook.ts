@@ -34,12 +34,26 @@ export function useAdminPanel() {
   });
 
   const removeAdmin = api.admin.removeAdmin.useMutation({
+    onMutate: async (variables) => {
+      await utils.admin.listAdmins.cancel();
+      const previous = utils.admin.listAdmins.getData();
+      utils.admin.listAdmins.setData(undefined, (old) => {
+        if (!old) return old;
+        return old.filter((a) => a.id !== variables.id);
+      });
+      return { previous };
+    },
     onSuccess: () => {
       toast.success("Admin removed");
-      void utils.admin.listAdmins.invalidate();
     },
-    onError: (error) => {
+    onError: (error, _vars, context) => {
+      if (context?.previous) {
+        utils.admin.listAdmins.setData(undefined, context.previous);
+      }
       toast.error(error.message ?? "Failed to remove admin");
+    },
+    onSettled: () => {
+      void utils.admin.listAdmins.invalidate();
     },
   });
 
@@ -55,13 +69,40 @@ export function useAdminPanel() {
   });
 
   const updateCategory = api.invoices.updateCategory.useMutation({
+    onMutate: async (variables) => {
+      await utils.invoices.listCategories.cancel();
+      const previous = utils.invoices.listCategories.getData();
+      utils.invoices.listCategories.setData(undefined, (old) => {
+        if (!old) return old;
+        return old.map((c) =>
+          c.id === variables.id
+            ? {
+                ...c,
+                ...(variables.name !== undefined && { name: variables.name }),
+                ...(variables.description !== undefined && {
+                  description: variables.description,
+                }),
+                ...(variables.sortOrder !== undefined && {
+                  sortOrder: variables.sortOrder,
+                }),
+              }
+            : c,
+        );
+      });
+      return { previous };
+    },
     onSuccess: () => {
       toast.success("Category updated");
       setEditingCategory(null);
-      void utils.invoices.listCategories.invalidate();
     },
-    onError: (error) => {
+    onError: (error, _vars, context) => {
+      if (context?.previous) {
+        utils.invoices.listCategories.setData(undefined, context.previous);
+      }
       toast.error(error.message ?? "Failed to update category");
+    },
+    onSettled: () => {
+      void utils.invoices.listCategories.invalidate();
     },
   });
 

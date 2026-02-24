@@ -7,7 +7,10 @@ import { Skeleton } from "~/components/ui/skeleton";
 import { BlurFade } from "~/components/ui/blur-fade";
 import { MagicCard } from "~/components/ui/magic-card";
 import { api } from "~/trpc/react";
-import type { ContractOverviewViewProps, Property } from "./contract-overview.types";
+import type {
+  ContractOverviewViewProps,
+  Property,
+} from "./contract-overview.types";
 
 function PropertyContractCard({ property }: { property: Property }) {
   const { data: latestContract, isLoading } =
@@ -23,7 +26,7 @@ function PropertyContractCard({ property }: { property: Property }) {
             </div>
             <div>
               <h3 className="text-lg font-semibold">{property.name}</h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 {property.addressLine1}, {property.city}
               </p>
             </div>
@@ -35,21 +38,24 @@ function PropertyContractCard({ property }: { property: Property }) {
           ) : latestContract ? (
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-sm">
-                <FileText className="h-4 w-4 text-muted-foreground" />
+                <FileText className="text-muted-foreground h-4 w-4" />
                 <span className="font-medium">
                   v{latestContract.version} - {latestContract.fileName}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 Uploaded{" "}
-                {new Date(latestContract.createdAt).toLocaleDateString("en-AU", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}
+                {new Date(latestContract.createdAt).toLocaleDateString(
+                  "en-AU",
+                  {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  },
+                )}
               </p>
               {latestContract.notes && (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   {latestContract.notes}
                 </p>
               )}
@@ -63,8 +69,8 @@ function PropertyContractCard({ property }: { property: Property }) {
               </Button>
             </div>
           ) : (
-            <div className="text-center py-4">
-              <p className="text-sm text-muted-foreground">
+            <div className="py-4 text-center">
+              <p className="text-muted-foreground text-sm">
                 No contracts uploaded yet.
               </p>
               <Button variant="outline" size="sm" className="mt-2" asChild>
@@ -106,11 +112,11 @@ export function ContractOverviewView({
       ) : properties.length === 0 ? (
         <BlurFade delay={0.1}>
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 text-center">
-            <div className="rounded-2xl bg-muted p-4">
-              <FileText className="h-8 w-8 text-muted-foreground/40" />
+            <div className="bg-muted rounded-2xl p-4">
+              <FileText className="text-muted-foreground/40 h-8 w-8" />
             </div>
             <p className="mt-4 text-lg font-medium">No properties found</p>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="text-muted-foreground mt-1 text-sm">
               Properties need to be created before contracts can be managed.
             </p>
           </div>

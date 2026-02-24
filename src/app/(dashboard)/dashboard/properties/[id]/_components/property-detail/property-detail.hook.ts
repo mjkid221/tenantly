@@ -46,12 +46,29 @@ export function usePropertyDetail(propertyId: number) {
   });
 
   const removeImageMutation = api.properties.removeImage.useMutation({
-    onSuccess: async () => {
-      await utils.properties.getById.invalidate({ id: propertyId });
+    onMutate: async (variables) => {
+      await utils.properties.getById.cancel({ id: propertyId });
+      const previous = utils.properties.getById.getData({ id: propertyId });
+      utils.properties.getById.setData({ id: propertyId }, (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          images: old.images.filter((img) => img.id !== variables.imageId),
+        };
+      });
+      return { previous };
+    },
+    onSuccess: () => {
       toast.success("Image removed successfully");
     },
-    onError: (error) => {
+    onError: (error, _vars, context) => {
+      if (context?.previous) {
+        utils.properties.getById.setData({ id: propertyId }, context.previous);
+      }
       toast.error(`Failed to remove image: ${error.message}`);
+    },
+    onSettled: () => {
+      void utils.properties.getById.invalidate({ id: propertyId });
     },
   });
 

@@ -89,20 +89,35 @@ export function InvoiceListView({
   isCreating,
 }: InvoiceListViewProps) {
   const [formPropertyId, setFormPropertyId] = useState<string>("");
+  const [formTenantId, setFormTenantId] = useState<string>("");
   const [formStart, setFormStart] = useState("");
   const [formEnd, setFormEnd] = useState("");
   const [formLabel, setFormLabel] = useState("");
+
+  const selectedProperty = properties.find(
+    (p) => p.id === Number(formPropertyId),
+  );
+
+  const handlePropertyChange = (value: string) => {
+    setFormPropertyId(value);
+    setFormTenantId("");
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formPropertyId || !formStart || !formEnd) return;
     onCreateInvoice({
       propertyId: Number(formPropertyId),
+      propertyTenantId:
+        formTenantId && formTenantId !== "all"
+          ? Number(formTenantId)
+          : undefined,
       billingPeriodStart: formStart,
       billingPeriodEnd: formEnd,
       label: formLabel,
     });
     setFormPropertyId("");
+    setFormTenantId("");
     setFormStart("");
     setFormEnd("");
     setFormLabel("");
@@ -121,7 +136,10 @@ export function InvoiceListView({
             </p>
           </div>
           {isAdmin && (
-            <Dialog open={isCreateDialogOpen} onOpenChange={onCreateDialogOpenChange}>
+            <Dialog
+              open={isCreateDialogOpen}
+              onOpenChange={onCreateDialogOpenChange}
+            >
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="mr-2 h-4 w-4" />
@@ -140,7 +158,7 @@ export function InvoiceListView({
                     <Label htmlFor="property">Property</Label>
                     <Select
                       value={formPropertyId}
-                      onValueChange={setFormPropertyId}
+                      onValueChange={handlePropertyChange}
                     >
                       <SelectTrigger id="property">
                         <SelectValue placeholder="Select property" />
@@ -160,6 +178,29 @@ export function InvoiceListView({
                       </SelectContent>
                     </Select>
                   </div>
+                  {selectedProperty && selectedProperty.tenants.length > 0 && (
+                    <div className="space-y-2">
+                      <Label htmlFor="tenant">Tenant</Label>
+                      <Select
+                        value={formTenantId}
+                        onValueChange={setFormTenantId}
+                      >
+                        <SelectTrigger id="tenant">
+                          <SelectValue placeholder="All Tenants" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Tenants</SelectItem>
+                          {selectedProperty.tenants.map((t) => (
+                            <SelectItem key={t.id} value={String(t.id)}>
+                              {t.fullName
+                                ? `${t.fullName} (${t.email})`
+                                : t.email}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="start">Period Start</Label>
@@ -201,7 +242,9 @@ export function InvoiceListView({
                     </Button>
                     <Button
                       type="submit"
-                      disabled={isCreating || !formPropertyId || !formStart || !formEnd}
+                      disabled={
+                        isCreating || !formPropertyId || !formStart || !formEnd
+                      }
                     >
                       {isCreating ? "Creating..." : "Create Invoice"}
                     </Button>
@@ -223,7 +266,8 @@ export function InvoiceListView({
                   All Invoices
                 </CardTitle>
                 <CardDescription>
-                  {invoices.length} invoice{invoices.length !== 1 ? "s" : ""} found
+                  {invoices.length} invoice{invoices.length !== 1 ? "s" : ""}{" "}
+                  found
                 </CardDescription>
               </div>
               <Select
@@ -254,11 +298,11 @@ export function InvoiceListView({
               </div>
             ) : invoices.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 text-center">
-                <div className="rounded-2xl bg-muted p-4">
-                  <Receipt className="h-8 w-8 text-muted-foreground/40" />
+                <div className="bg-muted rounded-2xl p-4">
+                  <Receipt className="text-muted-foreground/40 h-8 w-8" />
                 </div>
                 <p className="mt-4 text-lg font-medium">No invoices found</p>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="text-muted-foreground mt-1 text-sm">
                   {statusFilter !== "all"
                     ? "Try changing the status filter."
                     : isAdmin
@@ -271,6 +315,7 @@ export function InvoiceListView({
                 <TableHeader>
                   <TableRow>
                     <TableHead>Property</TableHead>
+                    <TableHead>Tenant</TableHead>
                     <TableHead>Period</TableHead>
                     <TableHead>Label</TableHead>
                     <TableHead>Status</TableHead>
@@ -292,7 +337,14 @@ export function InvoiceListView({
                           {invoice.property.name}
                         </TableCell>
                         <TableCell className="text-muted-foreground">
-                          {invoice.billingPeriodStart} - {invoice.billingPeriodEnd}
+                          {invoice.tenant
+                            ? (invoice.tenant.user?.fullName ??
+                              invoice.tenant.email)
+                            : "All"}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {invoice.billingPeriodStart} -{" "}
+                          {invoice.billingPeriodEnd}
                         </TableCell>
                         <TableCell className="text-muted-foreground">
                           {invoice.label ?? "-"}

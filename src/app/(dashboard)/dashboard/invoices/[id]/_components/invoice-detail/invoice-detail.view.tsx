@@ -10,6 +10,8 @@ import {
   Upload,
   DollarSign,
   Receipt,
+  Mail,
+  Paperclip,
 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import {
@@ -144,6 +146,15 @@ export function InvoiceDetailView({
   isDeleting,
   showDeleteDialog,
   setShowDeleteDialog,
+  onUploadAttachment,
+  isUploadingAttachment,
+  onRemoveAttachment,
+  isRemovingAttachment,
+  onViewAttachment,
+  onSendEmail,
+  isSendingEmail,
+  showResendDialog,
+  setShowResendDialog,
   isAddLineItemDialogOpen,
   onAddLineItemDialogOpenChange,
 }: InvoiceDetailViewProps) {
@@ -155,6 +166,7 @@ export function InvoiceDetailView({
   const [formProportionValue, setFormProportionValue] = useState("");
   const [formDescription, setFormDescription] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const attachmentInputRef = useRef<HTMLInputElement>(null);
   const [uploadingLineItemId, setUploadingLineItemId] = useState<number | null>(
     null,
   );
@@ -192,6 +204,18 @@ export function InvoiceDetailView({
     }
   };
 
+  const handleAttachmentFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      onUploadAttachment(file);
+    }
+    if (attachmentInputRef.current) {
+      attachmentInputRef.current.value = "";
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -212,6 +236,22 @@ export function InvoiceDetailView({
               </div>
             </div>
           </CardHeader>
+        </Card>
+
+        {/* Attachments Card */}
+        <Card className="rounded-2xl">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="space-y-1.5">
+                <Skeleton className="h-6 w-28" />
+                <Skeleton className="h-4 w-36" />
+              </div>
+              <Skeleton className="h-9 w-24 rounded-md" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-24 w-full rounded-2xl" />
+          </CardContent>
         </Card>
 
         {/* Line Items Card */}
@@ -253,12 +293,13 @@ export function InvoiceDetailView({
   if (!invoice) {
     return (
       <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-20">
-        <div className="rounded-2xl bg-muted p-4">
-          <Receipt className="h-8 w-8 text-muted-foreground/40" />
+        <div className="bg-muted rounded-2xl p-4">
+          <Receipt className="text-muted-foreground/40 h-8 w-8" />
         </div>
         <p className="mt-4 text-lg font-medium">Invoice not found</p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          The invoice you are looking for does not exist or you do not have access.
+        <p className="text-muted-foreground mt-1 text-sm">
+          The invoice you are looking for does not exist or you do not have
+          access.
         </p>
         <Button asChild variant="outline" className="mt-4">
           <Link href="/dashboard/invoices">Back to Invoices</Link>
@@ -268,17 +309,25 @@ export function InvoiceDetailView({
   }
 
   const breadcrumbLabel =
-    invoice.label ?? `${invoice.billingPeriodStart} - ${invoice.billingPeriodEnd}`;
+    invoice.label ??
+    `${invoice.billingPeriodStart} - ${invoice.billingPeriodEnd}`;
 
   return (
     <div className="space-y-6">
-      {/* Hidden file input for proof uploads */}
+      {/* Hidden file inputs */}
       <input
         type="file"
         ref={fileInputRef}
         className="hidden"
         accept=".pdf"
         onChange={handleFileChange}
+      />
+      <input
+        type="file"
+        ref={attachmentInputRef}
+        className="hidden"
+        accept=".pdf,.png,.jpg,.jpeg,.webp"
+        onChange={handleAttachmentFileChange}
       />
 
       {/* Breadcrumb */}
@@ -311,15 +360,40 @@ export function InvoiceDetailView({
                   {invoice.billingPeriodStart} to {invoice.billingPeriodEnd}
                   {invoice.label && ` -- ${invoice.label}`}
                 </CardDescription>
+                {invoice.tenant ? (
+                  <p className="text-muted-foreground text-sm">
+                    Tenant:{" "}
+                    {invoice.tenant.user?.fullName ?? invoice.tenant.email}
+                    {invoice.tenant.user?.fullName &&
+                      ` (${invoice.tenant.email})`}
+                  </p>
+                ) : (
+                  <p className="text-muted-foreground text-sm">All Tenants</p>
+                )}
+                {invoice.emailSentAt && (
+                  <p className="text-muted-foreground flex items-center gap-1 text-xs">
+                    <Mail className="h-3 w-3" />
+                    Emailed on{" "}
+                    {new Date(invoice.emailSentAt).toLocaleDateString("en-AU", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                    {invoice.emailSentTo && ` to ${invoice.emailSentTo}`}
+                  </p>
+                )}
               </div>
               <div className="flex items-center gap-3">
                 {(() => {
-                  const status = statusConfig[invoice.status] ?? statusConfig.draft!;
+                  const status =
+                    statusConfig[invoice.status] ?? statusConfig.draft!;
                   return (
                     <span
                       className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium ${status.bgColor} ${status.textColor}`}
                     >
-                      <span className={`h-2 w-2 rounded-full ${status.dotColor}`} />
+                      <span
+                        className={`h-2 w-2 rounded-full ${status.dotColor}`}
+                      />
                       {status.label}
                     </span>
                   );
@@ -345,6 +419,28 @@ export function InvoiceDetailView({
                         <SelectItem value="paid">Paid</SelectItem>
                       </SelectContent>
                     </Select>
+                    {invoice.status !== "draft" &&
+                      (invoice.emailSentAt ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowResendDialog(true)}
+                          disabled={isSendingEmail}
+                        >
+                          <Mail className="mr-2 h-4 w-4" />
+                          Resend
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={onSendEmail}
+                          disabled={isSendingEmail}
+                        >
+                          <Mail className="mr-2 h-4 w-4" />
+                          {isSendingEmail ? "Sending..." : "Send Email"}
+                        </Button>
+                      ))}
                     {invoice.status === "draft" && (
                       <Button
                         variant="ghost"
@@ -363,386 +459,484 @@ export function InvoiceDetailView({
         </Card>
       </BlurFade>
 
-      {/* Line Items Table */}
-      <BlurFade delay={0.15}>
-      <Card className="rounded-2xl">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Line Items</CardTitle>
-              <CardDescription>
-                {invoice.lineItems.length} item
-                {invoice.lineItems.length !== 1 ? "s" : ""} on this invoice
-              </CardDescription>
-            </div>
-            {isAdmin && (
-              <Dialog
-                open={isAddLineItemDialogOpen}
-                onOpenChange={onAddLineItemDialogOpenChange}
-              >
-                <DialogTrigger asChild>
-                  <Button size="sm">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Line Item
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Add Line Item</DialogTitle>
-                    <DialogDescription>
-                      Add a billing category item to this invoice.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <form onSubmit={handleAddLineItem} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="category">Category</Label>
-                      <Select
-                        value={formCategoryId}
-                        onValueChange={setFormCategoryId}
-                      >
-                        <SelectTrigger id="category">
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categoriesLoading ? (
-                            <SelectItem value="loading" disabled>
-                              Loading...
-                            </SelectItem>
-                          ) : (
-                            categories.map((c) => (
-                              <SelectItem key={c.id} value={String(c.id)}>
-                                {c.name}
-                              </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="totalBill">
-                          Total Bill (A$)
-                        </Label>
-                        <Input
-                          id="totalBill"
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          placeholder="0.00"
-                          value={formTotalBill}
-                          onChange={(e) => setFormTotalBill(e.target.value)}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="tenantCharge">
-                          Tenant Charge (A$)
-                        </Label>
-                        <Input
-                          id="tenantCharge"
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          placeholder="0.00"
-                          value={formTenantCharge}
-                          onChange={(e) => setFormTenantCharge(e.target.value)}
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="proportionType">Proportion Type</Label>
-                        <Select
-                          value={formProportionType}
-                          onValueChange={setFormProportionType}
-                        >
-                          <SelectTrigger id="proportionType">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="fixed">Fixed</SelectItem>
-                            <SelectItem value="percentage">
-                              Percentage
-                            </SelectItem>
-                            <SelectItem value="usage_only">
-                              Usage Only
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="proportionValue">
-                          Proportion Value
-                        </Label>
-                        <Input
-                          id="proportionValue"
-                          type="number"
-                          step="0.01"
-                          placeholder="e.g. 50.00"
-                          value={formProportionValue}
-                          onChange={(e) =>
-                            setFormProportionValue(e.target.value)
-                          }
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="description">
-                        Description (optional)
-                      </Label>
-                      <Input
-                        id="description"
-                        placeholder="Additional notes"
-                        value={formDescription}
-                        onChange={(e) => setFormDescription(e.target.value)}
-                      />
-                    </div>
-                    <DialogFooter>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => onAddLineItemDialogOpenChange(false)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        type="submit"
-                        disabled={
-                          isAddingLineItem ||
-                          !formCategoryId ||
-                          !formTotalBill ||
-                          !formTenantCharge
-                        }
-                      >
-                        {isAddingLineItem ? "Adding..." : "Add Item"}
-                      </Button>
-                    </DialogFooter>
-                  </form>
-                </DialogContent>
-              </Dialog>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          {invoice.lineItems.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 text-center">
-              <div className="rounded-2xl bg-muted p-4">
-                <DollarSign className="h-8 w-8 text-muted-foreground/40" />
+      {/* Attachments */}
+      <BlurFade delay={0.12}>
+        <Card className="rounded-2xl">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Attachments</CardTitle>
+                <CardDescription>
+                  {invoice.attachments.length} file
+                  {invoice.attachments.length !== 1 ? "s" : ""} attached
+                </CardDescription>
               </div>
-              <p className="mt-4 text-lg font-medium">No line items yet</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {isAdmin
-                  ? "Add billing items to this invoice."
-                  : "No charges have been added yet."}
-              </p>
+              {isAdmin && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={isUploadingAttachment}
+                  onClick={() => attachmentInputRef.current?.click()}
+                >
+                  <Upload className="mr-2 h-4 w-4" />
+                  {isUploadingAttachment ? "Uploading..." : "Upload"}
+                </Button>
+              )}
             </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Category</TableHead>
-                  {isAdmin && (
-                    <TableHead className="text-right">
-                      Total Bill (A$)
-                    </TableHead>
-                  )}
-                  <TableHead className="text-right">
-                    Tenant Charge (A$)
-                  </TableHead>
-                  <TableHead>Proportion</TableHead>
-                  <TableHead>Proof</TableHead>
-                  <TableHead>Payment</TableHead>
-                  {isAdmin && (
-                    <TableHead className="text-right">Actions</TableHead>
-                  )}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {invoice.lineItems.map((li) => {
-                  const { paidAmount, isPaid } = getLineItemPaymentStatus(li);
-                  const chargeAmount = parseFloat(li.tenantChargeAmount);
-                  return (
-                    <TableRow key={li.id}>
-                      <TableCell className="font-medium">
-                        {li.category.name}
-                        {li.description && (
-                          <p className="text-xs text-muted-foreground">
-                            {li.description}
-                          </p>
-                        )}
-                      </TableCell>
-                      {isAdmin && (
-                        <TableCell className="text-right">
-                          {formatCurrency(parseFloat(li.totalBillAmount))}
-                        </TableCell>
-                      )}
-                      <TableCell className="text-right">
-                        {formatCurrency(chargeAmount)}
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm capitalize">
-                          {li.proportionType.replace("_", " ")}
-                        </span>
-                        {li.proportionValue && (
-                          <span className="ml-1 text-xs text-muted-foreground">
-                            ({li.proportionValue}
-                            {li.proportionType === "percentage" ? "%" : ""})
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {li.proofFileName ? (
-                          <span className="flex items-center gap-1 text-sm text-blue-600">
-                            <FileText className="h-3 w-3" />
-                            {li.proofFileName}
-                          </span>
-                        ) : isAdmin ? (
+          </CardHeader>
+          <CardContent>
+            {invoice.attachments.length === 0 ? (
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-10 text-center">
+                <div className="bg-muted rounded-2xl p-4">
+                  <Paperclip className="text-muted-foreground/40 h-8 w-8" />
+                </div>
+                <p className="mt-4 text-sm font-medium">No attachments</p>
+                <p className="text-muted-foreground mt-1 text-xs">
+                  {isAdmin
+                    ? "Upload PDFs or images for tenants to view."
+                    : "No files attached to this invoice."}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {invoice.attachments.map((att) => (
+                  <div
+                    key={att.id}
+                    className="flex items-center justify-between rounded-lg border p-3"
+                  >
+                    <button
+                      type="button"
+                      className="flex items-center gap-2 text-sm hover:underline"
+                      onClick={() => onViewAttachment(att.id)}
+                    >
+                      <FileText className="text-muted-foreground h-4 w-4" />
+                      {att.fileName}
+                    </button>
+                    {isAdmin && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
                           <Button
                             variant="ghost"
                             size="sm"
-                            disabled={isUploadingProof}
-                            onClick={() => {
-                              setUploadingLineItemId(li.id);
-                              fileInputRef.current?.click();
-                            }}
+                            className="text-destructive hover:text-destructive"
                           >
-                            <Upload className="mr-1 h-3 w-3" />
-                            Upload
+                            <Trash2 className="h-3 w-3" />
                           </Button>
-                        ) : (
-                          <span className="text-sm text-muted-foreground">
-                            --
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {isPaid ? (
-                          <Badge
-                            variant="default"
-                            className="bg-green-100 text-green-700 hover:bg-green-100"
-                          >
-                            <CheckCircle className="mr-1 h-3 w-3" />
-                            Paid
-                          </Badge>
-                        ) : paidAmount > 0 ? (
-                          <Badge variant="outline">
-                            Partial ({formatCurrency(paidAmount)})
-                          </Badge>
-                        ) : (
-                          <Badge variant="secondary">Unpaid</Badge>
-                        )}
-                      </TableCell>
-                      {isAdmin && (
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-1">
-                            {!isPaid && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                disabled={isMarkingPaid}
-                                onClick={() =>
-                                  onMarkPaid(
-                                    li.id,
-                                    li.tenantChargeAmount,
-                                  )
-                                }
-                              >
-                                <CheckCircle className="mr-1 h-3 w-3" />
-                                Mark Paid
-                              </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Remove attachment?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will permanently delete &ldquo;{att.fileName}
+                              &rdquo;.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => onRemoveAttachment(att.id)}
+                              disabled={isRemovingAttachment}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              {isRemovingAttachment ? "Removing..." : "Remove"}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </BlurFade>
+
+      {/* Line Items Table */}
+      <BlurFade delay={0.17}>
+        <Card className="rounded-2xl">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Line Items</CardTitle>
+                <CardDescription>
+                  {invoice.lineItems.length} item
+                  {invoice.lineItems.length !== 1 ? "s" : ""} on this invoice
+                </CardDescription>
+              </div>
+              {isAdmin && (
+                <Dialog
+                  open={isAddLineItemDialogOpen}
+                  onOpenChange={onAddLineItemDialogOpenChange}
+                >
+                  <DialogTrigger asChild>
+                    <Button size="sm">
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add Line Item
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Add Line Item</DialogTitle>
+                      <DialogDescription>
+                        Add a billing category item to this invoice.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleAddLineItem} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="category">Category</Label>
+                        <Select
+                          value={formCategoryId}
+                          onValueChange={setFormCategoryId}
+                        >
+                          <SelectTrigger id="category">
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categoriesLoading ? (
+                              <SelectItem value="loading" disabled>
+                                Loading...
+                              </SelectItem>
+                            ) : (
+                              categories.map((c) => (
+                                <SelectItem key={c.id} value={String(c.id)}>
+                                  {c.name}
+                                </SelectItem>
+                              ))
                             )}
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="totalBill">Total Bill (A$)</Label>
+                          <Input
+                            id="totalBill"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            placeholder="0.00"
+                            value={formTotalBill}
+                            onChange={(e) => setFormTotalBill(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="tenantCharge">
+                            Tenant Charge (A$)
+                          </Label>
+                          <Input
+                            id="tenantCharge"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            placeholder="0.00"
+                            value={formTenantCharge}
+                            onChange={(e) =>
+                              setFormTenantCharge(e.target.value)
+                            }
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="proportionType">
+                            Proportion Type
+                          </Label>
+                          <Select
+                            value={formProportionType}
+                            onValueChange={setFormProportionType}
+                          >
+                            <SelectTrigger id="proportionType">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="fixed">Fixed</SelectItem>
+                              <SelectItem value="percentage">
+                                Percentage
+                              </SelectItem>
+                              <SelectItem value="usage_only">
+                                Usage Only
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="proportionValue">
+                            Proportion Value
+                          </Label>
+                          <Input
+                            id="proportionValue"
+                            type="number"
+                            step="0.01"
+                            placeholder="e.g. 50.00"
+                            value={formProportionValue}
+                            onChange={(e) =>
+                              setFormProportionValue(e.target.value)
+                            }
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="description">
+                          Description (optional)
+                        </Label>
+                        <Input
+                          id="description"
+                          placeholder="Additional notes"
+                          value={formDescription}
+                          onChange={(e) => setFormDescription(e.target.value)}
+                        />
+                      </div>
+                      <DialogFooter>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => onAddLineItemDialogOpenChange(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          type="submit"
+                          disabled={
+                            isAddingLineItem ||
+                            !formCategoryId ||
+                            !formTotalBill ||
+                            !formTenantCharge
+                          }
+                        >
+                          {isAddingLineItem ? "Adding..." : "Add Item"}
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            {invoice.lineItems.length === 0 ? (
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 text-center">
+                <div className="bg-muted rounded-2xl p-4">
+                  <DollarSign className="text-muted-foreground/40 h-8 w-8" />
+                </div>
+                <p className="mt-4 text-lg font-medium">No line items yet</p>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  {isAdmin
+                    ? "Add billing items to this invoice."
+                    : "No charges have been added yet."}
+                </p>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Category</TableHead>
+                    {isAdmin && (
+                      <TableHead className="text-right">
+                        Total Bill (A$)
+                      </TableHead>
+                    )}
+                    <TableHead className="text-right">
+                      Tenant Charge (A$)
+                    </TableHead>
+                    <TableHead>Proportion</TableHead>
+                    <TableHead>Proof</TableHead>
+                    <TableHead>Payment</TableHead>
+                    {isAdmin && (
+                      <TableHead className="text-right">Actions</TableHead>
+                    )}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {invoice.lineItems.map((li) => {
+                    const { paidAmount, isPaid } = getLineItemPaymentStatus(li);
+                    const chargeAmount = parseFloat(li.tenantChargeAmount);
+                    return (
+                      <TableRow key={li.id}>
+                        <TableCell className="font-medium">
+                          {li.category.name}
+                          {li.description && (
+                            <p className="text-muted-foreground text-xs">
+                              {li.description}
+                            </p>
+                          )}
+                        </TableCell>
+                        {isAdmin && (
+                          <TableCell className="text-right">
+                            {formatCurrency(parseFloat(li.totalBillAmount))}
+                          </TableCell>
+                        )}
+                        <TableCell className="text-right">
+                          {formatCurrency(chargeAmount)}
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm capitalize">
+                            {li.proportionType.replace("_", " ")}
+                          </span>
+                          {li.proportionValue && (
+                            <span className="text-muted-foreground ml-1 text-xs">
+                              ({li.proportionValue}
+                              {li.proportionType === "percentage" ? "%" : ""})
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {li.proofFileName ? (
+                            <span className="flex items-center gap-1 text-sm text-blue-600">
+                              <FileText className="h-3 w-3" />
+                              {li.proofFileName}
+                            </span>
+                          ) : isAdmin ? (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              disabled={isUploadingProof}
+                              onClick={() => {
+                                setUploadingLineItemId(li.id);
+                                fileInputRef.current?.click();
+                              }}
+                            >
+                              <Upload className="mr-1 h-3 w-3" />
+                              Upload
+                            </Button>
+                          ) : (
+                            <span className="text-muted-foreground text-sm">
+                              --
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {isPaid ? (
+                            <Badge
+                              variant="default"
+                              className="bg-green-100 text-green-700 hover:bg-green-100"
+                            >
+                              <CheckCircle className="mr-1 h-3 w-3" />
+                              Paid
+                            </Badge>
+                          ) : paidAmount > 0 ? (
+                            <Badge variant="outline">
+                              Partial ({formatCurrency(paidAmount)})
+                            </Badge>
+                          ) : (
+                            <Badge variant="secondary">Unpaid</Badge>
+                          )}
+                        </TableCell>
+                        {isAdmin && (
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              {!isPaid && (
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="text-destructive hover:text-destructive"
+                                  disabled={isMarkingPaid}
+                                  onClick={() =>
+                                    onMarkPaid(li.id, li.tenantChargeAmount)
+                                  }
                                 >
-                                  <Trash2 className="h-3 w-3" />
+                                  <CheckCircle className="mr-1 h-3 w-3" />
+                                  Mark Paid
                                 </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>
-                                    Remove line item?
-                                  </AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    This will permanently remove the{" "}
-                                    {li.category.name} line item and any
-                                    associated proof files. This action cannot be
-                                    undone.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() => onRemoveLineItem(li.id)}
-                                    disabled={isRemovingLineItem}
-                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              )}
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-destructive hover:text-destructive"
                                   >
-                                    {isRemovingLineItem
-                                      ? "Removing..."
-                                      : "Remove"}
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </div>
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                      Remove line item?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This will permanently remove the{" "}
+                                      {li.category.name} line item and any
+                                      associated proof files. This action cannot
+                                      be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                      Cancel
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => onRemoveLineItem(li.id)}
+                                      disabled={isRemovingLineItem}
+                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                    >
+                                      {isRemovingLineItem
+                                        ? "Removing..."
+                                        : "Remove"}
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
       </BlurFade>
 
       {/* Summary */}
       {paymentStatus && (
         <BlurFade delay={0.2}>
-        <Card className="rounded-2xl">
-          <CardHeader>
-            <CardTitle>Summary</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">
-                  Total Charged
-                </span>
-                <span className="font-medium">
-                  {formatCurrency(paymentStatus.totalCharged)}
-                </span>
+          <Card className="rounded-2xl">
+            <CardHeader>
+              <CardTitle>Summary</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground text-sm">
+                    Total Charged
+                  </span>
+                  <span className="font-medium">
+                    {formatCurrency(paymentStatus.totalCharged)}
+                  </span>
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground text-sm">
+                    Total Paid
+                  </span>
+                  <span className="font-medium text-green-600">
+                    {formatCurrency(paymentStatus.totalPaid)}
+                  </span>
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">
+                    Outstanding Balance
+                  </span>
+                  <span
+                    className={`text-lg font-bold ${
+                      paymentStatus.outstanding > 0
+                        ? "text-red-600"
+                        : "text-green-600"
+                    }`}
+                  >
+                    {formatCurrency(paymentStatus.outstanding)}
+                  </span>
+                </div>
               </div>
-              <Separator />
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">
-                  Total Paid
-                </span>
-                <span className="font-medium text-green-600">
-                  {formatCurrency(paymentStatus.totalPaid)}
-                </span>
-              </div>
-              <Separator />
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Outstanding Balance</span>
-                <span
-                  className={`text-lg font-bold ${
-                    paymentStatus.outstanding > 0
-                      ? "text-red-600"
-                      : "text-green-600"
-                  }`}
-                >
-                  {formatCurrency(paymentStatus.outstanding)}
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
         </BlurFade>
       )}
 
@@ -783,6 +977,39 @@ export function InvoiceDetailView({
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isDeleting ? "Deleting..." : "Delete Invoice"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Resend Email Confirmation */}
+      <AlertDialog open={showResendDialog} onOpenChange={setShowResendDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Resend Invoice Email?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This invoice was already emailed
+              {invoice?.emailSentAt && (
+                <>
+                  {" "}
+                  on{" "}
+                  {new Date(invoice.emailSentAt).toLocaleDateString("en-AU", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </>
+              )}
+              {invoice?.emailSentTo && <> to {invoice.emailSentTo}</>}. Are you
+              sure you want to send it again?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isSendingEmail}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={onSendEmail} disabled={isSendingEmail}>
+              {isSendingEmail ? "Sending..." : "Resend Email"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

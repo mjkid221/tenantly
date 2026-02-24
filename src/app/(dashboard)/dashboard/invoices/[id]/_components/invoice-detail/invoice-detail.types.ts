@@ -42,6 +42,19 @@ export interface InvoiceDetailViewProps {
   showDeleteDialog: boolean;
   setShowDeleteDialog: (open: boolean) => void;
 
+  // Invoice attachments
+  onUploadAttachment: (file: File) => void;
+  isUploadingAttachment: boolean;
+  onRemoveAttachment: (id: number) => void;
+  isRemovingAttachment: boolean;
+  onViewAttachment: (id: number) => void;
+
+  // Email sending
+  onSendEmail: () => void;
+  isSendingEmail: boolean;
+  showResendDialog: boolean;
+  setShowResendDialog: (open: boolean) => void;
+
   // Dialog state
   isAddLineItemDialogOpen: boolean;
   onAddLineItemDialogOpenChange: (open: boolean) => void;

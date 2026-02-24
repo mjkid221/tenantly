@@ -35,7 +35,7 @@ export function useGuestPropertyView(code: string) {
     (allowedSections.includes("contracts") && contractLoading);
 
   const error = validationError
-    ? validationError.message ?? "Invalid or expired access code"
+    ? (validationError.message ?? "Invalid or expired access code")
     : null;
 
   return {

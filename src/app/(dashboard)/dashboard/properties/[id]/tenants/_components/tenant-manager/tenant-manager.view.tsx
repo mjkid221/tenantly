@@ -10,12 +10,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Badge } from "~/components/ui/badge";
@@ -119,8 +114,8 @@ function AddTenantDialog({
           <DialogTitle>Add Tenant</DialogTitle>
           <DialogDescription>
             Assign a tenant to this property by their email address. If they
-            haven&apos;t signed up yet, they&apos;ll be linked automatically when
-            they do.
+            haven&apos;t signed up yet, they&apos;ll be linked automatically
+            when they do.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -154,9 +149,7 @@ function AddTenantDialog({
               Cancel
             </Button>
             <Button type="submit" disabled={!email.trim() || isAdding}>
-              {isAdding && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
+              {isAdding && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Add Tenant
             </Button>
           </DialogFooter>
@@ -234,11 +227,11 @@ export function TenantManagerView({
       {tenants.length === 0 ? (
         <BlurFade delay={0.15}>
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 text-center">
-            <div className="rounded-2xl bg-muted p-4">
-              <Users className="h-8 w-8 text-muted-foreground/40" />
+            <div className="bg-muted rounded-2xl p-4">
+              <Users className="text-muted-foreground/40 h-8 w-8" />
             </div>
             <h3 className="mt-4 text-lg font-semibold">No tenants assigned</h3>
-            <p className="mt-1 mb-4 text-sm text-muted-foreground">
+            <p className="text-muted-foreground mt-1 mb-4 text-sm">
               {isAdmin
                 ? "Add tenants to this property by their email address."
                 : "No tenants have been assigned yet."}
@@ -253,133 +246,142 @@ export function TenantManagerView({
         </BlurFade>
       ) : (
         <BlurFade delay={0.15}>
-        <div className="space-y-6">
-          {/* Active Tenants */}
-          <Card className="rounded-2xl">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                <Users className="h-4 w-4" />
-                Active Tenants ({activeTenants.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {activeTenants.length === 0 ? (
-                <p className="py-4 text-center text-sm text-muted-foreground">
-                  No active tenants
-                </p>
-              ) : (
-                <div className="space-y-4">
-                  {activeTenants.map((tenant) => (
-                    <div
-                      key={tenant.id}
-                      className="flex items-center justify-between rounded-xl border p-4 transition-colors hover:bg-accent/50"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">
-                          {tenant.user?.fullName?.[0]?.toUpperCase() ??
-                            tenant.email[0]?.toUpperCase()}
-                        </div>
-                        <div>
-                          <p className="font-medium">
-                            {tenant.user?.fullName ?? tenant.email}
-                          </p>
-                          <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <Mail className="h-3 w-3" />
-                              {tenant.email}
-                            </span>
-                            {tenant.moveInDate && (
-                              <span className="flex items-center gap-1">
-                                <Calendar className="h-3 w-3" />
-                                Moved in:{" "}
-                                {new Date(
-                                  tenant.moveInDate,
-                                ).toLocaleDateString("en-AU")}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {!tenant.user && (
-                          <Badge variant="outline" className="gap-1.5 rounded-full border-amber-200 text-amber-600 dark:border-amber-800 dark:text-amber-400">
-                            Pending sign-up
-                          </Badge>
-                        )}
-                        <Badge variant="secondary" className="gap-1.5 rounded-full">
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                          Active
-                        </Badge>
-                        {isAdmin && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onRequestRemove(tenant)}
-                          >
-                            <UserMinus className="h-4 w-4 text-destructive" />
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Inactive Tenants */}
-          {inactiveTenants.length > 0 && (
+          <div className="space-y-6">
+            {/* Active Tenants */}
             <Card className="rounded-2xl">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base font-semibold text-muted-foreground">
+                <CardTitle className="flex items-center gap-2 text-base font-semibold">
                   <Users className="h-4 w-4" />
-                  Past Tenants ({inactiveTenants.length})
+                  Active Tenants ({activeTenants.length})
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {inactiveTenants.map((tenant) => (
-                    <div
-                      key={tenant.id}
-                      className="flex items-center justify-between rounded-xl border border-dashed p-4 opacity-75"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted font-semibold text-muted-foreground">
-                          {tenant.user?.fullName?.[0]?.toUpperCase() ??
-                            tenant.email[0]?.toUpperCase()}
-                        </div>
-                        <div>
-                          <p className="font-medium">
-                            {tenant.user?.fullName ?? tenant.email}
-                          </p>
-                          <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <Mail className="h-3 w-3" />
-                              {tenant.email}
-                            </span>
-                            {tenant.moveOutDate && (
+                {activeTenants.length === 0 ? (
+                  <p className="text-muted-foreground py-4 text-center text-sm">
+                    No active tenants
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {activeTenants.map((tenant) => (
+                      <div
+                        key={tenant.id}
+                        className="hover:bg-accent/50 flex items-center justify-between rounded-xl border p-4 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-full font-semibold">
+                            {tenant.user?.fullName?.[0]?.toUpperCase() ??
+                              tenant.email[0]?.toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {tenant.user?.fullName ?? tenant.email}
+                            </p>
+                            <div className="text-muted-foreground flex items-center gap-3 text-sm">
                               <span className="flex items-center gap-1">
-                                <Calendar className="h-3 w-3" />
-                                Moved out:{" "}
-                                {new Date(
-                                  tenant.moveOutDate,
-                                ).toLocaleDateString("en-AU")}
+                                <Mail className="h-3 w-3" />
+                                {tenant.email}
                               </span>
-                            )}
+                              {tenant.moveInDate && (
+                                <span className="flex items-center gap-1">
+                                  <Calendar className="h-3 w-3" />
+                                  Moved in:{" "}
+                                  {new Date(
+                                    tenant.moveInDate,
+                                  ).toLocaleDateString("en-AU")}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
+                        <div className="flex items-center gap-2">
+                          {!tenant.user && (
+                            <Badge
+                              variant="outline"
+                              className="gap-1.5 rounded-full border-amber-200 text-amber-600 dark:border-amber-800 dark:text-amber-400"
+                            >
+                              Pending sign-up
+                            </Badge>
+                          )}
+                          <Badge
+                            variant="secondary"
+                            className="gap-1.5 rounded-full"
+                          >
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                            Active
+                          </Badge>
+                          {isAdmin && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => onRequestRemove(tenant)}
+                            >
+                              <UserMinus className="text-destructive h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
                       </div>
-                      <Badge variant="secondary" className="gap-1.5 rounded-full">
-                      <span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
-                      Inactive
-                    </Badge>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
-          )}
-        </div>
+
+            {/* Inactive Tenants */}
+            {inactiveTenants.length > 0 && (
+              <Card className="rounded-2xl">
+                <CardHeader>
+                  <CardTitle className="text-muted-foreground flex items-center gap-2 text-base font-semibold">
+                    <Users className="h-4 w-4" />
+                    Past Tenants ({inactiveTenants.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {inactiveTenants.map((tenant) => (
+                      <div
+                        key={tenant.id}
+                        className="flex items-center justify-between rounded-xl border border-dashed p-4 opacity-75"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="bg-muted text-muted-foreground flex h-10 w-10 items-center justify-center rounded-full font-semibold">
+                            {tenant.user?.fullName?.[0]?.toUpperCase() ??
+                              tenant.email[0]?.toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {tenant.user?.fullName ?? tenant.email}
+                            </p>
+                            <div className="text-muted-foreground flex items-center gap-3 text-sm">
+                              <span className="flex items-center gap-1">
+                                <Mail className="h-3 w-3" />
+                                {tenant.email}
+                              </span>
+                              {tenant.moveOutDate && (
+                                <span className="flex items-center gap-1">
+                                  <Calendar className="h-3 w-3" />
+                                  Moved out:{" "}
+                                  {new Date(
+                                    tenant.moveOutDate,
+                                  ).toLocaleDateString("en-AU")}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <Badge
+                          variant="secondary"
+                          className="gap-1.5 rounded-full"
+                        >
+                          <span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
+                          Inactive
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </BlurFade>
       )}
 

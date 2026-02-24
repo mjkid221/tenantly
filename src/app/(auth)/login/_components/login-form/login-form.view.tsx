@@ -17,22 +17,20 @@ export function LoginFormView({
   error,
 }: LoginFormViewProps) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="bg-background flex min-h-screen items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-primary">
-            <Building2 className="h-7 w-7 text-primary-foreground" />
+          <div className="bg-primary mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl">
+            <Building2 className="text-primary-foreground h-7 w-7" />
           </div>
-          <CardTitle className="text-2xl font-bold">
-            Property Manager
-          </CardTitle>
+          <CardTitle className="text-2xl font-bold">Property Manager</CardTitle>
           <CardDescription>
             Sign in to access your property dashboard
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {error && (
-            <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+            <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
               {error}
             </div>
           )}
@@ -79,7 +77,7 @@ export function LoginFormView({
             Continue with Microsoft
           </Button>
 
-          <div className="pt-2 text-center text-xs text-muted-foreground">
+          <div className="text-muted-foreground pt-2 text-center text-xs">
             Sign in with your Google, Hotmail, Yahoo, or Outlook account
           </div>
         </CardContent>

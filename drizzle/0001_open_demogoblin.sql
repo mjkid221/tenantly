@@ -1,0 +1,3 @@
+ALTER TABLE "private-real-esate-manager_invoice" ADD COLUMN "property_tenant_id" integer;--> statement-breakpoint
+ALTER TABLE "private-real-esate-manager_invoice" ADD CONSTRAINT "private-real-esate-manager_invoice_property_tenant_id_private-real-esate-manager_property_tenant_id_fk" FOREIGN KEY ("property_tenant_id") REFERENCES "public"."private-real-esate-manager_property_tenant"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "invoice_tenant_idx" ON "private-real-esate-manager_invoice" USING btree ("property_tenant_id");

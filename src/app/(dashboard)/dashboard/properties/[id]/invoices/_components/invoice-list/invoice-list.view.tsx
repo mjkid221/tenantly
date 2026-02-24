@@ -27,7 +27,10 @@ import type { InvoiceListViewProps, InvoiceStatus } from "./invoice-list.types";
 
 const statusConfig: Record<
   InvoiceStatus,
-  { label: string; variant: "default" | "secondary" | "destructive" | "outline" }
+  {
+    label: string;
+    variant: "default" | "secondary" | "destructive" | "outline";
+  }
 > = {
   draft: { label: "Draft", variant: "outline" },
   issued: { label: "Issued", variant: "default" },
@@ -133,9 +136,7 @@ export function InvoiceListView({
           </div>
           {isAdmin && (
             <Button asChild>
-              <Link
-                href={`/dashboard/invoices/new?propertyId=${propertyId}`}
-              >
+              <Link href={`/dashboard/invoices/new?propertyId=${propertyId}`}>
                 <Plus className="mr-2 h-4 w-4" />
                 Create Invoice
               </Link>
@@ -147,20 +148,18 @@ export function InvoiceListView({
       {invoices.length === 0 ? (
         <BlurFade delay={0.15}>
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 text-center">
-            <div className="rounded-2xl bg-muted p-4">
-              <Receipt className="h-8 w-8 text-muted-foreground/40" />
+            <div className="bg-muted rounded-2xl p-4">
+              <Receipt className="text-muted-foreground/40 h-8 w-8" />
             </div>
             <h3 className="mt-4 text-lg font-semibold">No invoices yet</h3>
-            <p className="mt-1 mb-4 text-sm text-muted-foreground">
+            <p className="text-muted-foreground mt-1 mb-4 text-sm">
               {isAdmin
                 ? "Create the first invoice for this property."
                 : "No invoices have been created yet."}
             </p>
             {isAdmin && (
               <Button asChild>
-                <Link
-                  href={`/dashboard/invoices/new?propertyId=${propertyId}`}
-                >
+                <Link href={`/dashboard/invoices/new?propertyId=${propertyId}`}>
                   <Plus className="mr-2 h-4 w-4" />
                   Create Invoice
                 </Link>
@@ -170,77 +169,77 @@ export function InvoiceListView({
         </BlurFade>
       ) : (
         <BlurFade delay={0.15}>
-        <Card className="rounded-2xl">
-          <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Period</TableHead>
-                  <TableHead>Label</TableHead>
-                  <TableHead>Items</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Tenant Charge</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="w-25" />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {invoices.map((invoice) => {
-                  const totalBill = invoice.lineItems.reduce(
-                    (sum, li) => sum + Number(li.totalBillAmount),
-                    0,
-                  );
-                  const tenantCharge = invoice.lineItems.reduce(
-                    (sum, li) => sum + Number(li.tenantChargeAmount),
-                    0,
-                  );
+          <Card className="rounded-2xl">
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Period</TableHead>
+                    <TableHead>Label</TableHead>
+                    <TableHead>Items</TableHead>
+                    <TableHead>Total</TableHead>
+                    <TableHead>Tenant Charge</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="w-25" />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {invoices.map((invoice) => {
+                    const totalBill = invoice.lineItems.reduce(
+                      (sum, li) => sum + Number(li.totalBillAmount),
+                      0,
+                    );
+                    const tenantCharge = invoice.lineItems.reduce(
+                      (sum, li) => sum + Number(li.tenantChargeAmount),
+                      0,
+                    );
 
-                  return (
-                    <TableRow key={invoice.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm">
-                            {formatDate(invoice.billingPeriodStart)} -{" "}
-                            {formatDate(invoice.billingPeriodEnd)}
+                    return (
+                      <TableRow key={invoice.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="text-muted-foreground h-4 w-4" />
+                            <span className="text-sm">
+                              {formatDate(invoice.billingPeriodStart)} -{" "}
+                              {formatDate(invoice.billingPeriodEnd)}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm font-medium">
+                            {invoice.label ?? "-"}
                           </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm font-medium">
-                          {invoice.label ?? "-"}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm">
-                          {invoice.lineItems.length}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm">
-                          {formatCurrency(totalBill)}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm font-medium">
-                          {formatCurrency(tenantCharge)}
-                        </span>
-                      </TableCell>
-                      <TableCell>{getStatusBadge(invoice.status)}</TableCell>
-                      <TableCell>
-                        <Button asChild variant="ghost" size="sm">
-                          <Link href={`/dashboard/invoices/${invoice.id}`}>
-                            View
-                          </Link>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm">
+                            {invoice.lineItems.length}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm">
+                            {formatCurrency(totalBill)}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm font-medium">
+                            {formatCurrency(tenantCharge)}
+                          </span>
+                        </TableCell>
+                        <TableCell>{getStatusBadge(invoice.status)}</TableCell>
+                        <TableCell>
+                          <Button asChild variant="ghost" size="sm">
+                            <Link href={`/dashboard/invoices/${invoice.id}`}>
+                              View
+                            </Link>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </BlurFade>
       )}
     </div>
