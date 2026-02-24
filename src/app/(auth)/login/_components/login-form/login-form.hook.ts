@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createSupabaseBrowserClient } from "~/lib/supabase/client";
+import { getSiteUrl } from "~/lib/url";
 import type { OAuthProvider } from "./login-form.types";
 
 export function useLoginForm() {
@@ -16,7 +17,7 @@ export function useLoginForm() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${getSiteUrl()}/auth/callback`,
       },
     });
 
