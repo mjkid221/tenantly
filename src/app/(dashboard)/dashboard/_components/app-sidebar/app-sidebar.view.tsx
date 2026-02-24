@@ -1,0 +1,149 @@
+"use client";
+
+import Link from "next/link";
+import {
+  Building2,
+  FileText,
+  Key,
+  LayoutDashboard,
+  LogOut,
+  Receipt,
+  Settings,
+  Shield,
+} from "lucide-react";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "~/components/ui/sidebar";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
+import { ThemeToggle } from "~/components/theme-toggle";
+import type { AppSidebarViewProps } from "./app-sidebar.types";
+
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  "layout-dashboard": LayoutDashboard,
+  "building-2": Building2,
+  receipt: Receipt,
+  "file-text": FileText,
+  shield: Shield,
+  key: Key,
+  settings: Settings,
+};
+
+export function AppSidebarView({
+  navItems,
+  role,
+  userName,
+  userEmail,
+  userAvatar,
+  pathname,
+  onSignOut,
+}: AppSidebarViewProps) {
+  const initials =
+    userName
+      ?.split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2) ?? userEmail.slice(0, 2).toUpperCase();
+
+  return (
+    <Sidebar>
+      <SidebarHeader className="border-b px-6 py-4">
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+            <Building2 className="h-4 w-4 text-primary-foreground" />
+          </div>
+          <div>
+            <span className="text-sm font-semibold">Property Manager</span>
+            <Badge variant="secondary" className="ml-2 text-[10px]">
+              {role}
+            </Badge>
+          </div>
+        </Link>
+      </SidebarHeader>
+
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {navItems.map((item) => {
+                const Icon = iconMap[item.icon] ?? LayoutDashboard;
+                const isActive =
+                  pathname === item.href ||
+                  (item.href !== "/dashboard" &&
+                    pathname.startsWith(item.href));
+
+                return (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton asChild isActive={isActive}>
+                      <Link href={item.href}>
+                        <Icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter className="border-t p-4">
+        <div className="mb-2 flex justify-end">
+          <ThemeToggle />
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex w-full items-center gap-3 rounded-md p-2 text-left text-sm hover:bg-sidebar-accent">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={userAvatar ?? undefined} />
+                <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+              </Avatar>
+              <div className="flex-1 overflow-hidden">
+                <p className="truncate text-sm font-medium">
+                  {userName ?? userEmail}
+                </p>
+                {userName && (
+                  <p className="truncate text-xs text-muted-foreground">
+                    {userEmail}
+                  </p>
+                )}
+              </div>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem asChild>
+              <Link href="/dashboard/settings">
+                <Settings className="mr-2 h-4 w-4" />
+                Settings
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={onSignOut}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Sign Out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}
