@@ -110,28 +110,26 @@ export function AppSidebarView({
       </SidebarContent>
 
       <SidebarFooter className="border-t p-4">
-        <div className="mb-2 flex justify-end">
-          <AnimatedThemeToggler className="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground inline-flex size-8 items-center justify-center rounded-md transition-colors" />
-        </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="hover:bg-sidebar-accent flex w-full items-center gap-3 rounded-xl p-2 text-left text-sm transition-colors duration-200">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={userAvatar ?? undefined} />
-                <AvatarFallback className="text-xs">{initials}</AvatarFallback>
-              </Avatar>
-              <div className="flex-1 overflow-hidden">
-                <p className="truncate text-sm font-medium">
-                  {userName ?? userEmail}
-                </p>
-                {userName && (
-                  <p className="text-muted-foreground truncate text-xs">
-                    {userEmail}
+        <div className="flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="hover:bg-sidebar-accent flex min-w-0 flex-1 items-center gap-3 rounded-xl p-2 text-left text-sm transition-colors duration-200">
+                <Avatar className="h-8 w-8 shrink-0">
+                  <AvatarImage src={userAvatar ?? undefined} />
+                  <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium">
+                    {userName ?? userEmail}
                   </p>
-                )}
-              </div>
-            </button>
-          </DropdownMenuTrigger>
+                  {userName && (
+                    <p className="text-muted-foreground truncate text-xs">
+                      {userEmail}
+                    </p>
+                  )}
+                </div>
+              </button>
+            </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuItem asChild>
               <Link href="/dashboard/settings">
@@ -145,7 +143,9 @@ export function AppSidebarView({
               Sign Out
             </DropdownMenuItem>
           </DropdownMenuContent>
-        </DropdownMenu>
+          </DropdownMenu>
+          <AnimatedThemeToggler className="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground inline-flex size-8 shrink-0 items-center justify-center rounded-md transition-colors" />
+        </div>
       </SidebarFooter>
     </Sidebar>
   );
