@@ -15,6 +15,7 @@ import {
   invoiceAttachments,
   propertyTenants,
   paymentMethods,
+  payments,
 } from "~/server/db/schema";
 import { supabaseAdmin } from "~/lib/supabase/admin";
 import { resend } from "~/lib/resend";
@@ -178,17 +179,48 @@ export const invoicesRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { id, ...data } = input;
-      const [updated] = await ctx.db
-        .update(invoices)
-        .set(data)
-        .where(eq(invoices.id, id))
-        .returning();
 
-      if (!updated) {
-        throw new TRPCError({ code: "NOT_FOUND" });
-      }
+      return await ctx.db.transaction(async (tx) => {
+        const [updated] = await tx
+          .update(invoices)
+          .set(data)
+          .where(eq(invoices.id, id))
+          .returning();
 
-      return updated;
+        if (!updated) {
+          throw new TRPCError({ code: "NOT_FOUND" });
+        }
+
+        // When invoice is marked as "paid", auto-pay all unpaid line items
+        if (input.status === "paid") {
+          const lineItems = await tx.query.invoiceLineItems.findMany({
+            where: eq(invoiceLineItems.invoiceId, id),
+            with: { payments: true },
+          });
+
+          for (const li of lineItems) {
+            const confirmedTotal = li.payments
+              .filter((p) => p.status === "confirmed")
+              .reduce((sum, p) => sum + parseFloat(p.amount), 0);
+            const chargeAmount = parseFloat(li.tenantChargeAmount);
+            const remaining = chargeAmount - confirmedTotal;
+
+            if (remaining > 0) {
+              await tx.insert(payments).values({
+                invoiceLineItemId: li.id,
+                amount: remaining.toFixed(2),
+                status: "confirmed",
+                paidAt: new Date(),
+                confirmedAt: new Date(),
+                confirmedByUserId: ctx.user.id,
+                notes: "Auto-paid via invoice status update",
+              });
+            }
+          }
+        }
+
+        return updated;
+      });
     }),
 
   delete: adminProcedure
