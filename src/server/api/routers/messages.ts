@@ -306,8 +306,19 @@ export const messagesRouter = createTRPCRouter({
     let userList: Array<typeof users.$inferSelect>;
 
     if (ctx.role === "admin") {
+      // Only show users who are active tenants in a property
+      const activeTenantIds = await ctx.db
+        .selectDistinct({ userId: propertyTenants.userId })
+        .from(propertyTenants)
+        .where(eq(propertyTenants.isActive, true));
+
+      const ids = activeTenantIds
+        .map((t) => t.userId)
+        .filter(Boolean) as number[];
+      if (ids.length === 0) return [];
+
       userList = await ctx.db.query.users.findMany({
-        where: sql`${users.id} != ${ctx.user.id}`,
+        where: and(sql`${users.id} != ${ctx.user.id}`, inArray(users.id, ids)),
         orderBy: (u, { asc }) => [asc(u.fullName)],
       });
     } else {
