@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/cron/unread-messages",
-      "schedule": "0 */12 * * *"
+      "schedule": "0 0 * * *"
     }
   ]
 }
