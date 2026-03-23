@@ -4,7 +4,7 @@ A property management platform for tracking rental contracts, invoices, tenant b
 
 [tenantly.icu](https://tenantly.icu)
 
-<img width="1466" height="737" alt="Screenshot 2026-02-24 at 10 34 20 PM" src="https://github.com/user-attachments/assets/8d2ef968-3374-492e-bbad-52194c60ac5e" />
+<img width="1450" height="737" alt="Screenshot 2026-03-23 at 8 38 10 PM" src="https://github.com/user-attachments/assets/a9769e7b-40c6-47db-85ad-8c78c8672cd8" />
 
 ## Features
 
