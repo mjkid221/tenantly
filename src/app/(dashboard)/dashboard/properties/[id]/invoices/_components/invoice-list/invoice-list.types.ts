@@ -10,4 +10,14 @@ export interface InvoiceListViewProps {
   invoices: Invoice[];
   isLoading: boolean;
   isAdmin: boolean;
+  tenants: Array<{ id: number; email: string; fullName: string | null }>;
+  isCreateDialogOpen: boolean;
+  onCreateDialogOpenChange: (open: boolean) => void;
+  onCreateInvoice: (values: {
+    propertyTenantId?: number;
+    billingPeriodStart: string;
+    billingPeriodEnd: string;
+    label?: string;
+  }) => void;
+  isCreating: boolean;
 }

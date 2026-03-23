@@ -1,6 +1,6 @@
 import { EditPropertyWrapper } from "./_components/edit-property-wrapper";
 
-export const metadata = { title: "Edit Property - Property Manager" };
+export const metadata = { title: "Edit Property - Tenantly" };
 
 export default async function EditPropertyPage({
   params,

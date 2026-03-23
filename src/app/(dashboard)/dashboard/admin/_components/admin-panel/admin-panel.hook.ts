@@ -19,6 +19,8 @@ export function useAdminPanel() {
     api.admin.listAdmins.useQuery();
   const { data: categories, isLoading: categoriesLoading } =
     api.invoices.listCategories.useQuery();
+  const { data: paymentMethodsList, isLoading: paymentMethodsLoading } =
+    api.settings.listAllPaymentMethods.useQuery();
 
   const utils = api.useUtils();
 
@@ -106,50 +108,95 @@ export function useAdminPanel() {
     },
   });
 
-  const onAddAdmin = () => {
-    if (!newAdminEmail.trim()) return;
-    addAdmin.mutate({ email: newAdminEmail.trim() });
+  const invalidatePaymentMethods = () => {
+    void utils.settings.listAllPaymentMethods.invalidate();
+    void utils.settings.listPaymentMethods.invalidate();
   };
 
-  const onRemoveAdmin = (id: number) => {
-    removeAdmin.mutate({ id });
-  };
+  const createPaymentMethod = api.settings.createPaymentMethod.useMutation({
+    onSuccess: () => {
+      toast.success("Payment method added");
+      invalidatePaymentMethods();
+    },
+    onError: (error) => {
+      toast.error(error.message ?? "Failed to add payment method");
+    },
+  });
 
-  const onCreateCategory = (values: CreateCategoryFormValues) => {
-    createCategory.mutate({
-      name: values.name,
-      description: values.description || undefined,
-      sortOrder: values.sortOrder,
-    });
-  };
+  const updatePaymentMethod = api.settings.updatePaymentMethod.useMutation({
+    onSuccess: () => {
+      toast.success("Payment method updated");
+      invalidatePaymentMethods();
+    },
+    onError: (error) => {
+      toast.error(error.message ?? "Failed to update payment method");
+    },
+  });
 
-  const onUpdateCategory = (values: UpdateCategoryFormValues) => {
-    updateCategory.mutate({
-      id: values.id,
-      name: values.name,
-      description: values.description || undefined,
-      sortOrder: values.sortOrder,
-    });
-  };
+  const deletePaymentMethod = api.settings.deletePaymentMethod.useMutation({
+    onSuccess: () => {
+      toast.success("Payment method deleted");
+      invalidatePaymentMethods();
+    },
+    onError: (error) => {
+      toast.error(error.message ?? "Failed to delete payment method");
+    },
+  });
 
   return {
     admins: admins ?? [],
     adminsLoading,
     newAdminEmail,
     onNewAdminEmailChange: setNewAdminEmail,
-    onAddAdmin,
+    onAddAdmin: () => {
+      if (!newAdminEmail.trim()) return;
+      addAdmin.mutate({ email: newAdminEmail.trim() });
+    },
     isAddingAdmin: addAdmin.isPending,
-    onRemoveAdmin,
+    onRemoveAdmin: (id: number) => removeAdmin.mutate({ id }),
     isRemovingAdmin: removeAdmin.isPending,
     categories: categories ?? [],
     categoriesLoading,
-    onCreateCategory,
+    onCreateCategory: (values: CreateCategoryFormValues) => {
+      createCategory.mutate({
+        name: values.name,
+        description: values.description || undefined,
+        sortOrder: values.sortOrder,
+      });
+    },
     isCreatingCategory: createCategory.isPending,
-    onUpdateCategory,
+    onUpdateCategory: (values: UpdateCategoryFormValues) => {
+      updateCategory.mutate({
+        id: values.id,
+        name: values.name,
+        description: values.description || undefined,
+        sortOrder: values.sortOrder,
+      });
+    },
     isUpdatingCategory: updateCategory.isPending,
     isCreateCategoryDialogOpen,
     onCreateCategoryDialogOpenChange: setIsCreateCategoryDialogOpen,
     editingCategory,
     onEditCategory: setEditingCategory,
+    paymentMethods: paymentMethodsList ?? [],
+    paymentMethodsLoading,
+    onCreatePaymentMethod: (values: { name: string; details: string }) => {
+      createPaymentMethod.mutate({
+        name: values.name,
+        details: values.details,
+      });
+    },
+    isCreatingPaymentMethod: createPaymentMethod.isPending,
+    onUpdatePaymentMethod: (values: {
+      id: number;
+      name?: string;
+      details?: string;
+      isActive?: boolean;
+    }) => {
+      updatePaymentMethod.mutate(values);
+    },
+    isUpdatingPaymentMethod: updatePaymentMethod.isPending,
+    onDeletePaymentMethod: (id: number) => deletePaymentMethod.mutate({ id }),
+    isDeletingPaymentMethod: deletePaymentMethod.isPending,
   };
 }

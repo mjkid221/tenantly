@@ -4,7 +4,7 @@ import { GuestCodeManager } from "./_components/guest-code-manager";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Guest Codes - Property Manager",
+  title: "Guest Codes - Tenantly",
 };
 
 export default async function GuestCodesPage() {

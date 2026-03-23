@@ -58,4 +58,11 @@ export interface InvoiceDetailViewProps {
   // Dialog state
   isAddLineItemDialogOpen: boolean;
   onAddLineItemDialogOpenChange: (open: boolean) => void;
+
+  // Payment methods
+  paymentMethodsList: Array<{ id: number; name: string; details: string }>;
+
+  // File preview
+  previewFile: { url: string; fileName: string; mimeType?: string } | null;
+  onClosePreview: () => void;
 }

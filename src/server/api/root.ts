@@ -6,6 +6,9 @@ import { invoicesRouter } from "~/server/api/routers/invoices";
 import { paymentsRouter } from "~/server/api/routers/payments";
 import { adminRouter } from "~/server/api/routers/admin";
 import { guestRouter } from "~/server/api/routers/guest";
+import { documentsRouter } from "~/server/api/routers/documents";
+import { messagesRouter } from "~/server/api/routers/messages";
+import { settingsRouter } from "~/server/api/routers/settings";
 
 export const appRouter = createTRPCRouter({
   user: userRouter,
@@ -15,6 +18,9 @@ export const appRouter = createTRPCRouter({
   payments: paymentsRouter,
   admin: adminRouter,
   guest: guestRouter,
+  documents: documentsRouter,
+  messages: messagesRouter,
+  settings: settingsRouter,
 });
 
 export type AppRouter = typeof appRouter;

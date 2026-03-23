@@ -8,8 +8,8 @@ import { TooltipProvider } from "~/components/ui/tooltip";
 import { TRPCReactProvider } from "~/trpc/react";
 
 export const metadata: Metadata = {
-  title: "Property Manager",
-  description: "Private real estate management dashboard",
+  title: "Tenantly",
+  description: "Property management made simple",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
@@ -26,7 +26,7 @@ export default function RootLayout({
       <body>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >

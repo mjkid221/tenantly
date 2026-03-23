@@ -4,7 +4,7 @@ import { ContractOverview } from "./_components/contract-overview";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Contracts - Property Manager",
+  title: "Contracts - Tenantly",
 };
 
 export default async function ContractsPage() {

@@ -1,6 +1,6 @@
 import { PropertyForm } from "./_components/property-form";
 
-export const metadata = { title: "New Property - Property Manager" };
+export const metadata = { title: "New Property - Tenantly" };
 
 export default function NewPropertyPage() {
   return (

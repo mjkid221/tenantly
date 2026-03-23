@@ -30,6 +30,8 @@ export interface InvoiceListViewProps {
   isAdmin: boolean;
   statusFilter: InvoiceStatus | "all";
   onStatusFilterChange: (status: InvoiceStatus | "all") => void;
+  propertyFilter: number | "all";
+  onPropertyFilterChange: (propertyId: number | "all") => void;
   isCreateDialogOpen: boolean;
   onCreateDialogOpenChange: (open: boolean) => void;
   properties: PropertyOption[];

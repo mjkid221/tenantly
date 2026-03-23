@@ -12,8 +12,10 @@ import {
   Receipt,
   Mail,
   Paperclip,
+  Eye,
 } from "lucide-react";
 import { Button } from "~/components/ui/button";
+import { FilePreviewModal } from "~/components/file-preview-modal";
 import {
   Card,
   CardContent,
@@ -157,6 +159,9 @@ export function InvoiceDetailView({
   setShowResendDialog,
   isAddLineItemDialogOpen,
   onAddLineItemDialogOpenChange,
+  paymentMethodsList,
+  previewFile,
+  onClosePreview,
 }: InvoiceDetailViewProps) {
   const [formCategoryId, setFormCategoryId] = useState<string>("");
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
@@ -164,6 +169,47 @@ export function InvoiceDetailView({
   const [formTenantCharge, setFormTenantCharge] = useState("");
   const [formProportionType, setFormProportionType] = useState<string>("fixed");
   const [formProportionValue, setFormProportionValue] = useState("");
+
+  // Auto-calculate tenant charge based on proportion type
+  const handleProportionTypeChange = (type: string) => {
+    setFormProportionType(type);
+    if (type === "usage_only") {
+      setFormTenantCharge(formTotalBill);
+      setFormProportionValue("");
+    } else if (type === "percentage" && formProportionValue && formTotalBill) {
+      const calc = (
+        (parseFloat(formTotalBill) * parseFloat(formProportionValue)) /
+        100
+      ).toFixed(2);
+      setFormTenantCharge(calc);
+    } else if (type === "fixed") {
+      setFormProportionValue("");
+    }
+  };
+
+  const handleTotalBillChange = (value: string) => {
+    setFormTotalBill(value);
+    if (formProportionType === "usage_only") {
+      setFormTenantCharge(value);
+    } else if (formProportionType === "percentage" && formProportionValue) {
+      const calc = (
+        (parseFloat(value) * parseFloat(formProportionValue)) /
+        100
+      ).toFixed(2);
+      setFormTenantCharge(isNaN(parseFloat(calc)) ? "" : calc);
+    }
+  };
+
+  const handleProportionValueChange = (value: string) => {
+    setFormProportionValue(value);
+    if (formProportionType === "percentage" && formTotalBill) {
+      const calc = (
+        (parseFloat(formTotalBill) * parseFloat(value)) /
+        100
+      ).toFixed(2);
+      setFormTenantCharge(isNaN(parseFloat(calc)) ? "" : calc);
+    }
+  };
   const [formDescription, setFormDescription] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const attachmentInputRef = useRef<HTMLInputElement>(null);
@@ -504,48 +550,56 @@ export function InvoiceDetailView({
                     key={att.id}
                     className="flex items-center justify-between rounded-lg border p-3"
                   >
-                    <button
-                      type="button"
-                      className="flex items-center gap-2 text-sm hover:underline"
-                      onClick={() => onViewAttachment(att.id)}
-                    >
-                      <FileText className="text-muted-foreground h-4 w-4" />
-                      {att.fileName}
-                    </button>
-                    {isAdmin && (
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Remove attachment?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This will permanently delete &ldquo;{att.fileName}
-                              &rdquo;.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => onRemoveAttachment(att.id)}
-                              disabled={isRemovingAttachment}
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    <div className="flex min-w-0 items-center gap-2">
+                      <FileText className="text-muted-foreground h-4 w-4 shrink-0" />
+                      <span className="truncate text-sm">{att.fileName}</span>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onViewAttachment(att.id)}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      {isAdmin && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-destructive hover:text-destructive"
                             >
-                              {isRemovingAttachment ? "Removing..." : "Remove"}
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    )}
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Remove attachment?
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will permanently delete &ldquo;
+                                {att.fileName}
+                                &rdquo;.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => onRemoveAttachment(att.id)}
+                                disabled={isRemovingAttachment}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                {isRemovingAttachment
+                                  ? "Removing..."
+                                  : "Remove"}
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -619,7 +673,9 @@ export function InvoiceDetailView({
                             min="0"
                             placeholder="0.00"
                             value={formTotalBill}
-                            onChange={(e) => setFormTotalBill(e.target.value)}
+                            onChange={(e) =>
+                              handleTotalBillChange(e.target.value)
+                            }
                             required
                           />
                         </div>
@@ -637,48 +693,61 @@ export function InvoiceDetailView({
                             onChange={(e) =>
                               setFormTenantCharge(e.target.value)
                             }
+                            disabled={formProportionType !== "fixed"}
                             required
                           />
+                          {formProportionType !== "fixed" && (
+                            <p className="text-muted-foreground text-xs">
+                              Auto-calculated from{" "}
+                              {formProportionType === "percentage"
+                                ? "percentage"
+                                : "total bill"}
+                            </p>
+                          )}
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="proportionType">
-                            Proportion Type
-                          </Label>
+                          <Label htmlFor="proportionType">Charge Method</Label>
                           <Select
                             value={formProportionType}
-                            onValueChange={setFormProportionType}
+                            onValueChange={handleProportionTypeChange}
                           >
                             <SelectTrigger id="proportionType">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="fixed">Fixed</SelectItem>
+                              <SelectItem value="fixed">
+                                Fixed Amount
+                              </SelectItem>
                               <SelectItem value="percentage">
-                                Percentage
+                                Percentage of Bill
                               </SelectItem>
                               <SelectItem value="usage_only">
-                                Usage Only
+                                Full Amount
                               </SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="proportionValue">
-                            Proportion Value
-                          </Label>
-                          <Input
-                            id="proportionValue"
-                            type="number"
-                            step="0.01"
-                            placeholder="e.g. 50.00"
-                            value={formProportionValue}
-                            onChange={(e) =>
-                              setFormProportionValue(e.target.value)
-                            }
-                          />
-                        </div>
+                        {formProportionType === "percentage" && (
+                          <div className="space-y-2">
+                            <Label htmlFor="proportionValue">
+                              Percentage (%)
+                            </Label>
+                            <Input
+                              id="proportionValue"
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              max="100"
+                              placeholder="e.g. 50"
+                              value={formProportionValue}
+                              onChange={(e) =>
+                                handleProportionValueChange(e.target.value)
+                              }
+                            />
+                          </div>
+                        )}
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="description">
@@ -743,7 +812,7 @@ export function InvoiceDetailView({
                     <TableHead className="text-right">
                       Tenant Charge (A$)
                     </TableHead>
-                    <TableHead>Proportion</TableHead>
+                    <TableHead>Charge Method</TableHead>
                     <TableHead>Proof</TableHead>
                     <TableHead>Payment</TableHead>
                     {isAdmin && (
@@ -774,15 +843,13 @@ export function InvoiceDetailView({
                           {formatCurrency(chargeAmount)}
                         </TableCell>
                         <TableCell>
-                          <span className="text-sm capitalize">
-                            {li.proportionType.replace("_", " ")}
+                          <span className="text-sm">
+                            {li.proportionType === "fixed"
+                              ? "Fixed"
+                              : li.proportionType === "percentage"
+                                ? `${li.proportionValue ?? ""}% of bill`
+                                : "Full amount"}
                           </span>
-                          {li.proportionValue && (
-                            <span className="text-muted-foreground ml-1 text-xs">
-                              ({li.proportionValue}
-                              {li.proportionType === "percentage" ? "%" : ""})
-                            </span>
-                          )}
                         </TableCell>
                         <TableCell>
                           {li.proofFileName ? (
@@ -940,6 +1007,29 @@ export function InvoiceDetailView({
         </BlurFade>
       )}
 
+      {/* Payment Methods */}
+      {paymentMethodsList.length > 0 && (
+        <BlurFade delay={0.45}>
+          <Card className="rounded-2xl">
+            <CardHeader>
+              <CardTitle className="text-base">Payment Methods</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {paymentMethodsList.map((method) => (
+                  <div key={method.id} className="bg-muted/50 rounded-xl p-4">
+                    <p className="text-sm font-semibold">{method.name}</p>
+                    <pre className="text-muted-foreground mt-1 font-sans text-sm leading-relaxed whitespace-pre-wrap">
+                      {method.details}
+                    </pre>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </BlurFade>
+      )}
+
       {/* Delete Invoice Confirmation */}
       <AlertDialog
         open={showDeleteDialog}
@@ -1014,6 +1104,16 @@ export function InvoiceDetailView({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {previewFile && (
+        <FilePreviewModal
+          open={!!previewFile}
+          onClose={onClosePreview}
+          url={previewFile.url}
+          fileName={previewFile.fileName}
+          mimeType={previewFile.mimeType}
+        />
+      )}
     </div>
   );
 }

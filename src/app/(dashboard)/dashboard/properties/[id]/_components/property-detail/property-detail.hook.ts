@@ -34,6 +34,11 @@ export function usePropertyDetail(propertyId: number) {
     { enabled: !isNaN(propertyId) },
   );
 
+  const { data: documents } = api.documents.listByProperty.useQuery(
+    { propertyId },
+    { enabled: !isNaN(propertyId) },
+  );
+
   const deleteMutation = api.properties.delete.useMutation({
     onSuccess: async () => {
       await utils.properties.list.invalidate();
@@ -95,5 +100,6 @@ export function usePropertyDetail(propertyId: number) {
     setShowDeleteDialog,
     contracts: contracts ?? [],
     invoices: invoices ?? [],
+    documents: documents ?? [],
   };
 }

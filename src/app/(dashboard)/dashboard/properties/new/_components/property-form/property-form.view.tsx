@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { X, Upload, Loader2 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -221,10 +222,12 @@ export function PropertyFormView({
                       key={`${image.fileName}-${index}`}
                       className="group relative aspect-video overflow-hidden rounded-xl border"
                     >
-                      <img
+                      <Image
                         src={image.preview}
                         alt={image.fileName}
-                        className="h-full w-full object-cover"
+                        fill
+                        className="object-cover"
+                        unoptimized
                       />
                       <button
                         type="button"

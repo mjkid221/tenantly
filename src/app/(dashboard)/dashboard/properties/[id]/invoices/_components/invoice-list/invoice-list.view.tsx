@@ -1,9 +1,27 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Receipt, Plus, Calendar } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import { Badge } from "~/components/ui/badge";
 import { Skeleton } from "~/components/ui/skeleton";
 import {
@@ -97,7 +115,35 @@ export function InvoiceListView({
   invoices,
   isLoading,
   isAdmin,
+  tenants,
+  isCreateDialogOpen,
+  onCreateDialogOpenChange,
+  onCreateInvoice,
+  isCreating,
 }: InvoiceListViewProps) {
+  const [formTenantId, setFormTenantId] = useState<string>("");
+  const [formStart, setFormStart] = useState("");
+  const [formEnd, setFormEnd] = useState("");
+  const [formLabel, setFormLabel] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formStart || !formEnd) return;
+    onCreateInvoice({
+      propertyTenantId:
+        formTenantId && formTenantId !== "all"
+          ? Number(formTenantId)
+          : undefined,
+      billingPeriodStart: formStart,
+      billingPeriodEnd: formEnd,
+      label: formLabel || undefined,
+    });
+    setFormTenantId("");
+    setFormStart("");
+    setFormEnd("");
+    setFormLabel("");
+  };
+
   if (isLoading) {
     return <LoadingSkeleton />;
   }
@@ -135,11 +181,9 @@ export function InvoiceListView({
             </p>
           </div>
           {isAdmin && (
-            <Button asChild>
-              <Link href={`/dashboard/invoices?propertyId=${propertyId}`}>
-                <Plus className="mr-2 h-4 w-4" />
-                Create Invoice
-              </Link>
+            <Button onClick={() => onCreateDialogOpenChange(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Invoice
             </Button>
           )}
         </div>
@@ -158,11 +202,9 @@ export function InvoiceListView({
                 : "No invoices have been created yet."}
             </p>
             {isAdmin && (
-              <Button asChild>
-                <Link href={`/dashboard/invoices?propertyId=${propertyId}`}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create Invoice
-                </Link>
+              <Button onClick={() => onCreateDialogOpenChange(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Invoice
               </Button>
             )}
           </div>
@@ -242,6 +284,84 @@ export function InvoiceListView({
           </Card>
         </BlurFade>
       )}
+
+      {/* Create Invoice Dialog */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={onCreateDialogOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Invoice</DialogTitle>
+            <DialogDescription>
+              Create a new invoice for {propertyName ?? "this property"}.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {tenants.length > 0 && (
+              <div className="space-y-2">
+                <Label htmlFor="tenant">Tenant</Label>
+                <Select value={formTenantId} onValueChange={setFormTenantId}>
+                  <SelectTrigger id="tenant">
+                    <SelectValue placeholder="All Tenants" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Tenants</SelectItem>
+                    {tenants.map((t) => (
+                      <SelectItem key={t.id} value={String(t.id)}>
+                        {t.fullName ? `${t.fullName} (${t.email})` : t.email}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="invoiceStart">Period Start</Label>
+                <Input
+                  id="invoiceStart"
+                  type="date"
+                  value={formStart}
+                  onChange={(e) => setFormStart(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="invoiceEnd">Period End</Label>
+                <Input
+                  id="invoiceEnd"
+                  type="date"
+                  value={formEnd}
+                  onChange={(e) => setFormEnd(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="invoiceLabel">Label (optional)</Label>
+              <Input
+                id="invoiceLabel"
+                placeholder="e.g. Q1 2025 Utilities"
+                value={formLabel}
+                onChange={(e) => setFormLabel(e.target.value)}
+              />
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onCreateDialogOpenChange(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isCreating || !formStart || !formEnd}
+              >
+                {isCreating ? "Creating..." : "Create Invoice"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -3,6 +3,9 @@ import type { RouterOutputs } from "~/trpc/react";
 export type Admin = RouterOutputs["admin"]["listAdmins"][number];
 export type Category = RouterOutputs["invoices"]["listCategories"][number];
 
+export type PaymentMethod =
+  RouterOutputs["settings"]["listAllPaymentMethods"][number];
+
 export interface AdminPanelViewProps {
   // Admin management
   admins: Admin[];
@@ -27,6 +30,21 @@ export interface AdminPanelViewProps {
   onCreateCategoryDialogOpenChange: (open: boolean) => void;
   editingCategory: Category | null;
   onEditCategory: (category: Category | null) => void;
+
+  // Payment methods
+  paymentMethods: PaymentMethod[];
+  paymentMethodsLoading: boolean;
+  onCreatePaymentMethod: (values: { name: string; details: string }) => void;
+  isCreatingPaymentMethod: boolean;
+  onUpdatePaymentMethod: (values: {
+    id: number;
+    name?: string;
+    details?: string;
+    isActive?: boolean;
+  }) => void;
+  isUpdatingPaymentMethod: boolean;
+  onDeletePaymentMethod: (id: number) => void;
+  isDeletingPaymentMethod: boolean;
 }
 
 export interface CreateCategoryFormValues {

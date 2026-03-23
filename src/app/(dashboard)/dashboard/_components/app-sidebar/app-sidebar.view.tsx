@@ -70,7 +70,7 @@ export function AppSidebarView({
             <Building2 className="text-primary-foreground h-4 w-4" />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold">Property Manager</span>
+            <span className="text-sm font-semibold">Tenantly</span>
             <Badge variant="secondary" className="rounded-full text-[10px]">
               {role}
             </Badge>
@@ -116,7 +116,9 @@ export function AppSidebarView({
               <button className="hover:bg-sidebar-accent flex min-w-0 flex-1 items-center gap-3 rounded-xl p-2 text-left text-sm transition-colors duration-200">
                 <Avatar className="h-8 w-8 shrink-0">
                   <AvatarImage src={userAvatar ?? undefined} />
-                  <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+                  <AvatarFallback className="text-xs">
+                    {initials}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium">
@@ -130,19 +132,19 @@ export function AppSidebarView({
                 </div>
               </button>
             </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuItem asChild>
-              <Link href="/dashboard/settings">
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={onSignOut}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign Out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/settings">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={onSignOut}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
           </DropdownMenu>
           <AnimatedThemeToggler className="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground inline-flex size-8 shrink-0 items-center justify-center rounded-md transition-colors" />
         </div>

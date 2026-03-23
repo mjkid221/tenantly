@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /Users/mjlee/Documents/Personal/real-estate-contract-manager -name .env* -o -name *.env)",
+      "Bash(ls -la /Users/mjlee/Documents/Personal/real-estate-contract-manager/src/app/\\\\\\(dashboard\\\\\\)/dashboard/properties/[id]/)",
+      "Bash(grep -r webp /Users/mjlee/Documents/Personal/real-estate-contract-manager --include=*.js --include=*.ts --include=*.tsx --include=*.json)",
+      "Bash(ls -la \"/Users/mjlee/Documents/Personal/real-estate-contract-manager/src/app/\\(dashboard\\)/dashboard/properties/[id]/\")",
+      "Bash(find \"/Users/mjlee/Documents/Personal/real-estate-contract-manager/src/app/\\(dashboard\\)/dashboard/properties/\\\\[id\\\\]/_components\" -type f)",
+      "Bash(find \"/Users/mjlee/Documents/Personal/real-estate-contract-manager/src/app/\\(dashboard\\)/dashboard/properties\" -name \"*.tsx\" -o -name \"*.ts\")",
+      "Bash(find \"/Users/mjlee/Documents/Personal/real-estate-contract-manager/src/app/\\(dashboard\\)/dashboard/properties\" -path \"*\\\\[id\\\\]/_components*\" -type f)",
+      "Bash(pnpm db:generate)",
+      "Bash(pnpm db:push)",
+      "Bash(npx tsx -e \":*)",
+      "Bash(source /Users/mjlee/Documents/Personal/real-estate-contract-manager/.env)",
+      "Bash(find /Users/mjlee/Documents/Personal/real-estate-contract-manager -type f -path *template* -o -path *email*)",
+      "Bash(xargs sed:*)"
+    ],
+    "additionalDirectories": [
+      "/Users/mjlee/Documents/Personal/real-estate-contract-manager/src/app/(dashboard)/dashboard/properties/[id]/documents/_components"
+    ]
+  }
+}

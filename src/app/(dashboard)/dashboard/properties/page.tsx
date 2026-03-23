@@ -3,7 +3,7 @@ import { PropertyList } from "./_components/property-list";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Properties - Property Manager" };
+export const metadata = { title: "Properties - Tenantly" };
 
 export default async function PropertiesPage() {
   void api.properties.list.prefetch();

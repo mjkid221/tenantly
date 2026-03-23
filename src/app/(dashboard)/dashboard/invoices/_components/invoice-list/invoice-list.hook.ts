@@ -12,6 +12,7 @@ export function useInvoiceList() {
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | "all">(
     "all",
   );
+  const [propertyFilter, setPropertyFilter] = useState<number | "all">("all");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const { data: user } = api.user.me.useQuery();
@@ -34,8 +35,10 @@ export function useInvoiceList() {
   const isAdmin = user?.role === "admin";
 
   const filteredInvoices = (invoices ?? []).filter((invoice) => {
-    if (statusFilter === "all") return true;
-    return invoice.status === statusFilter;
+    if (statusFilter !== "all" && invoice.status !== statusFilter) return false;
+    if (propertyFilter !== "all" && invoice.propertyId !== propertyFilter)
+      return false;
+    return true;
   });
 
   const onCreateInvoice = (values: CreateInvoiceFormValues) => {
@@ -54,6 +57,8 @@ export function useInvoiceList() {
     isAdmin,
     statusFilter,
     onStatusFilterChange: setStatusFilter,
+    propertyFilter,
+    onPropertyFilterChange: setPropertyFilter,
     isCreateDialogOpen,
     onCreateDialogOpenChange: setIsCreateDialogOpen,
     properties: (properties ?? []).map((p) => ({

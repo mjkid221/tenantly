@@ -14,6 +14,11 @@ export function useInvoiceDetail(id: number) {
   const [isAddLineItemDialogOpen, setIsAddLineItemDialogOpen] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showResendDialog, setShowResendDialog] = useState(false);
+  const [previewFile, setPreviewFile] = useState<{
+    url: string;
+    fileName: string;
+    mimeType?: string;
+  } | null>(null);
 
   const { data: user } = api.user.me.useQuery();
   const { data: invoice, isLoading: invoiceLoading } =
@@ -24,6 +29,8 @@ export function useInvoiceDetail(id: number) {
   );
   const { data: categories, isLoading: categoriesLoading } =
     api.invoices.listCategories.useQuery();
+  const { data: paymentMethodsList } =
+    api.settings.listPaymentMethods.useQuery();
 
   const utils = api.useUtils();
   const isAdmin = user?.role === "admin";
@@ -243,10 +250,15 @@ export function useInvoiceDetail(id: number) {
 
   const onViewAttachment = async (attachmentId: number) => {
     try {
+      const att = invoice?.attachments.find((a) => a.id === attachmentId);
       const result = await utils.invoices.getAttachmentUrl.fetch({
         attachmentId,
       });
-      window.open(result.url, "_blank");
+      setPreviewFile({
+        url: result.url,
+        fileName: result.fileName,
+        mimeType: att?.mimeType ?? undefined,
+      });
     } catch {
       toast.error("Failed to open attachment");
     }
@@ -288,5 +300,8 @@ export function useInvoiceDetail(id: number) {
     setShowResendDialog,
     isAddLineItemDialogOpen,
     onAddLineItemDialogOpenChange: setIsAddLineItemDialogOpen,
+    paymentMethodsList: paymentMethodsList ?? [],
+    previewFile,
+    onClosePreview: () => setPreviewFile(null),
   };
 }

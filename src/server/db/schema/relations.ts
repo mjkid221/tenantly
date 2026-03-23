@@ -2,6 +2,13 @@ import { relations } from "drizzle-orm";
 import { users, admins } from "./users";
 import { properties, propertyImages, propertyTenants } from "./properties";
 import { contracts } from "./contracts";
+import { propertyDocuments } from "./documents";
+import {
+  conversations,
+  conversationParticipants,
+  messages,
+  messageReadStatus,
+} from "./messages";
 import {
   invoices,
   invoiceLineItems,
@@ -28,6 +35,7 @@ export const propertiesRelations = relations(properties, ({ many }) => ({
   contracts: many(contracts),
   invoices: many(invoices),
   guestAccessCodes: many(guestAccessCodes),
+  documents: many(propertyDocuments),
 }));
 
 export const propertyImagesRelations = relations(propertyImages, ({ one }) => ({
@@ -123,6 +131,20 @@ export const paymentsRelations = relations(payments, ({ one }) => ({
   }),
 }));
 
+export const propertyDocumentsRelations = relations(
+  propertyDocuments,
+  ({ one }) => ({
+    property: one(properties, {
+      fields: [propertyDocuments.propertyId],
+      references: [properties.id],
+    }),
+    uploadedBy: one(users, {
+      fields: [propertyDocuments.uploadedByUserId],
+      references: [users.id],
+    }),
+  }),
+);
+
 export const guestAccessCodesRelations = relations(
   guestAccessCodes,
   ({ one }) => ({
@@ -132,6 +154,51 @@ export const guestAccessCodesRelations = relations(
     }),
     createdBy: one(users, {
       fields: [guestAccessCodes.createdByUserId],
+      references: [users.id],
+    }),
+  }),
+);
+
+export const conversationsRelations = relations(conversations, ({ many }) => ({
+  participants: many(conversationParticipants),
+  messages: many(messages),
+}));
+
+export const conversationParticipantsRelations = relations(
+  conversationParticipants,
+  ({ one }) => ({
+    conversation: one(conversations, {
+      fields: [conversationParticipants.conversationId],
+      references: [conversations.id],
+    }),
+    user: one(users, {
+      fields: [conversationParticipants.userId],
+      references: [users.id],
+    }),
+  }),
+);
+
+export const messagesRelations = relations(messages, ({ one, many }) => ({
+  conversation: one(conversations, {
+    fields: [messages.conversationId],
+    references: [conversations.id],
+  }),
+  sender: one(users, {
+    fields: [messages.senderId],
+    references: [users.id],
+  }),
+  readStatuses: many(messageReadStatus),
+}));
+
+export const messageReadStatusRelations = relations(
+  messageReadStatus,
+  ({ one }) => ({
+    message: one(messages, {
+      fields: [messageReadStatus.messageId],
+      references: [messages.id],
+    }),
+    user: one(users, {
+      fields: [messageReadStatus.userId],
       references: [users.id],
     }),
   }),

@@ -1,7 +1,7 @@
 import { GuestPropertyView } from "./_components/guest-property-view";
 
 export const metadata = {
-  title: "Guest Property View - Property Manager",
+  title: "Guest Property View - Tenantly",
 };
 
 export default async function GuestCodePage({

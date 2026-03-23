@@ -3,7 +3,7 @@ import { ContractList } from "./_components/contract-list";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Contracts - Property Manager" };
+export const metadata = { title: "Contracts - Tenantly" };
 
 export default async function ContractsPage({
   params,

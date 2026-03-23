@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { GuestEntry } from "./_components/guest-entry";
 
 export const metadata = {
-  title: "Guest Access - Property Manager",
+  title: "Guest Access - Tenantly",
 };
 
 export default function GuestPage() {

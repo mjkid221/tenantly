@@ -4,7 +4,7 @@ import { DashboardHome } from "./_components/dashboard-home";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Dashboard - Property Manager",
+  title: "Dashboard - Tenantly",
 };
 
 export default async function DashboardPage() {

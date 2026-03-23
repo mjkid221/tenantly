@@ -56,7 +56,10 @@ export function DashboardHome({ role, userName }: DashboardHomeProps) {
       (i) => i.status === "issued" || i.status === "partially_paid",
     ).length ?? 0;
   const tenantCount =
-    properties?.reduce((sum, p) => sum + (p.tenants?.length ?? 0), 0) ?? 0;
+    properties?.reduce(
+      (sum, p) => sum + (p.tenants?.filter((t) => t.isActive).length ?? 0),
+      0,
+    ) ?? 0;
 
   const firstName = userName?.split(" ")[0];
 
@@ -169,8 +172,8 @@ export function DashboardHome({ role, userName }: DashboardHomeProps) {
       {/* Recent Sections */}
       {role === "admin" && (
         <div className="grid gap-6 lg:grid-cols-2">
-          <BlurFade delay={0.3}>
-            <Card className="rounded-2xl shadow-sm">
+          <BlurFade delay={0.3} className="h-full">
+            <Card className="flex h-full flex-col rounded-2xl shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-base font-semibold">
                   Recent Properties
@@ -182,7 +185,7 @@ export function DashboardHome({ role, userName }: DashboardHomeProps) {
                   </Link>
                 </Button>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex flex-1 flex-col">
                 {properties && properties.length > 0 ? (
                   <div className="space-y-2">
                     {properties.slice(0, 5).map((property) => (
@@ -208,7 +211,7 @@ export function DashboardHome({ role, userName }: DashboardHomeProps) {
                     ))}
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center py-8 text-center">
+                  <div className="flex flex-1 flex-col items-center justify-center py-8 text-center">
                     <Building2 className="text-muted-foreground/40 h-8 w-8" />
                     <p className="text-muted-foreground mt-2 text-sm">
                       No properties yet
@@ -229,8 +232,8 @@ export function DashboardHome({ role, userName }: DashboardHomeProps) {
             </Card>
           </BlurFade>
 
-          <BlurFade delay={0.35}>
-            <Card className="rounded-2xl shadow-sm">
+          <BlurFade delay={0.35} className="h-full">
+            <Card className="flex h-full flex-col rounded-2xl shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-base font-semibold">
                   Recent Invoices
@@ -242,7 +245,7 @@ export function DashboardHome({ role, userName }: DashboardHomeProps) {
                   </Link>
                 </Button>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex flex-1 flex-col">
                 {invoicesData && invoicesData.length > 0 ? (
                   <div className="space-y-2">
                     {invoicesData.slice(0, 5).map((invoice) => {
@@ -276,7 +279,7 @@ export function DashboardHome({ role, userName }: DashboardHomeProps) {
                     })}
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center py-8 text-center">
+                  <div className="flex flex-1 flex-col items-center justify-center py-8 text-center">
                     <Receipt className="text-muted-foreground/40 h-8 w-8" />
                     <p className="text-muted-foreground mt-2 text-sm">
                       No invoices yet

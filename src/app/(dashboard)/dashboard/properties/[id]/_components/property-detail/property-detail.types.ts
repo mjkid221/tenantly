@@ -5,6 +5,8 @@ export type PropertyImage = PropertyData["images"][number];
 export type PropertyTenant = PropertyData["tenants"][number];
 export type Contract = RouterOutputs["contracts"]["listByProperty"][number];
 export type Invoice = RouterOutputs["invoices"]["list"][number];
+export type PropertyDocument =
+  RouterOutputs["documents"]["listByProperty"][number];
 
 export interface PropertyDetailViewProps {
   property: PropertyData | undefined;
@@ -19,4 +21,5 @@ export interface PropertyDetailViewProps {
   setShowDeleteDialog: (open: boolean) => void;
   contracts: Contract[];
   invoices: Invoice[];
+  documents: PropertyDocument[];
 }

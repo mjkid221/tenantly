@@ -1,3 +1,8 @@
+export function getPublicStorageUrl(bucket: string, path: string) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  return `${supabaseUrl}/storage/v1/object/public/${bucket}/${path}`;
+}
+
 export function getSiteUrl() {
   // Explicit site URL takes priority (set in Vercel env vars for production)
   if (process.env.NEXT_PUBLIC_SITE_URL) {

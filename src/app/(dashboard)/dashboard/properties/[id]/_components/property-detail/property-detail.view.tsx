@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import {
   Building2,
   Edit,
@@ -13,6 +14,7 @@ import {
   ImageIcon,
   ArrowRight,
   Calendar,
+  FolderOpen,
 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
@@ -99,6 +101,7 @@ export function PropertyDetailView({
   setShowDeleteDialog,
   contracts,
   invoices,
+  documents,
 }: PropertyDetailViewProps) {
   if (isLoading) {
     return <LoadingSkeleton />;
@@ -193,10 +196,12 @@ export function PropertyDetailView({
       {heroImage && imageBaseUrl ? (
         <BlurFade delay={0.15}>
           <div className="bg-muted relative aspect-21/9 w-full overflow-hidden rounded-2xl">
-            <img
+            <Image
               src={`${imageBaseUrl}${heroImage.storagePath}`}
               alt={property.name}
-              className="h-full w-full object-cover"
+              fill
+              className="object-cover"
+              unoptimized
             />
             <div className="absolute inset-0 bg-linear-to-t from-black/30 via-transparent to-transparent" />
             {isAdmin && (
@@ -233,10 +238,12 @@ export function PropertyDetailView({
                 key={image.id}
                 className="group relative aspect-video overflow-hidden rounded-xl border"
               >
-                <img
+                <Image
                   src={`${imageBaseUrl}${image.storagePath}`}
                   alt={image.fileName}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  unoptimized
                 />
                 {isAdmin && (
                   <button
@@ -256,7 +263,7 @@ export function PropertyDetailView({
 
       {/* Info Cards */}
       <BlurFade delay={0.25}>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Link href={`/dashboard/properties/${property.id}/tenants`}>
             <MagicCard className="rounded-2xl" gradientOpacity={0.1}>
               <div className="flex items-center gap-3 p-5">
@@ -316,6 +323,25 @@ export function PropertyDetailView({
               </div>
             </MagicCard>
           </Link>
+          <Link href={`/dashboard/properties/${property.id}/documents`}>
+            <MagicCard className="rounded-2xl" gradientOpacity={0.1}>
+              <div className="flex items-center gap-3 p-5">
+                <div className="rounded-xl bg-purple-500/10 p-2.5">
+                  <FolderOpen className="h-5 w-5 text-purple-500" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">
+                    {documents.length > 0 ? (
+                      <NumberTicker value={documents.length} />
+                    ) : (
+                      "0"
+                    )}
+                  </p>
+                  <p className="text-muted-foreground text-sm">Documents</p>
+                </div>
+              </div>
+            </MagicCard>
+          </Link>
         </div>
       </BlurFade>
 
@@ -334,6 +360,10 @@ export function PropertyDetailView({
             <TabsTrigger value="tenants">
               <Users className="mr-2 h-4 w-4" />
               Tenants
+            </TabsTrigger>
+            <TabsTrigger value="documents">
+              <FolderOpen className="mr-2 h-4 w-4" />
+              Documents
             </TabsTrigger>
           </TabsList>
 
@@ -529,6 +559,65 @@ export function PropertyDetailView({
                           href={`/dashboard/properties/${property.id}/tenants`}
                         >
                           Manage Tenants
+                          <ArrowRight className="ml-1 h-4 w-4" />
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="documents">
+            <Card className="rounded-2xl">
+              <CardContent className="p-5">
+                {documents.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-8 text-center">
+                    <div className="bg-muted rounded-2xl p-4">
+                      <FolderOpen className="text-muted-foreground/40 h-8 w-8" />
+                    </div>
+                    <h3 className="mt-4 text-sm font-semibold">
+                      No documents yet
+                    </h3>
+                    <p className="text-muted-foreground mt-1 text-sm">
+                      Upload property documents to get started.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {documents.slice(0, 3).map((doc) => (
+                      <div
+                        key={doc.id}
+                        className="flex items-center justify-between rounded-xl border p-3"
+                      >
+                        <div className="flex items-center gap-3">
+                          <FileText className="text-muted-foreground h-5 w-5" />
+                          <div>
+                            <p className="text-sm font-medium">
+                              {doc.fileName}
+                            </p>
+                            <p className="text-muted-foreground text-xs">
+                              {doc.documentType.replace(/_/g, " ")} &middot;{" "}
+                              {new Date(doc.createdAt).toLocaleDateString(
+                                "en-AU",
+                                {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                },
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    <div className="flex justify-end">
+                      <Button asChild variant="ghost" size="sm">
+                        <Link
+                          href={`/dashboard/properties/${property.id}/documents`}
+                        >
+                          View All
                           <ArrowRight className="ml-1 h-4 w-4" />
                         </Link>
                       </Button>

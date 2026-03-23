@@ -134,7 +134,7 @@ function UploadDialog({
               }}
             />
             {selectedFile && (
-              <p className="text-muted-foreground text-sm">
+              <p className="text-muted-foreground truncate text-sm">
                 Selected: {selectedFile.name} (
                 {(selectedFile.size / 1024).toFixed(1)} KB)
               </p>

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Shield, Trash2, Tag, Pencil } from "lucide-react";
+import { Plus, Shield, Trash2, Tag, Pencil, Landmark } from "lucide-react";
 import { Button } from "~/components/ui/button";
+import { Badge } from "~/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -147,7 +148,52 @@ export function AdminPanelView({
   onCreateCategoryDialogOpenChange,
   editingCategory,
   onEditCategory,
+  paymentMethods,
+  paymentMethodsLoading: _paymentMethodsLoading,
+  onCreatePaymentMethod,
+  isCreatingPaymentMethod,
+  onUpdatePaymentMethod,
+  isUpdatingPaymentMethod,
+  onDeletePaymentMethod,
+  isDeletingPaymentMethod: _isDeletingPaymentMethod,
 }: AdminPanelViewProps) {
+  const [newMethodName, setNewMethodName] = useState("");
+  const [newMethodDetails, setNewMethodDetails] = useState("");
+  const [editingMethodId, setEditingMethodId] = useState<number | null>(null);
+  const [editMethodName, setEditMethodName] = useState("");
+  const [editMethodDetails, setEditMethodDetails] = useState("");
+
+  const handleAddPaymentMethod = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMethodName.trim() || !newMethodDetails.trim()) return;
+    onCreatePaymentMethod({
+      name: newMethodName.trim(),
+      details: newMethodDetails.trim(),
+    });
+    setNewMethodName("");
+    setNewMethodDetails("");
+  };
+
+  const startEditingMethod = (method: {
+    id: number;
+    name: string;
+    details: string;
+  }) => {
+    setEditingMethodId(method.id);
+    setEditMethodName(method.name);
+    setEditMethodDetails(method.details);
+  };
+
+  const handleSaveEditMethod = () => {
+    if (editingMethodId === null) return;
+    onUpdatePaymentMethod({
+      id: editingMethodId,
+      name: editMethodName.trim(),
+      details: editMethodDetails.trim(),
+    });
+    setEditingMethodId(null);
+  };
+
   return (
     <div className="space-y-6">
       <BlurFade delay={0.05}>
@@ -168,7 +214,11 @@ export function AdminPanelView({
             </TabsTrigger>
             <TabsTrigger value="categories">
               <Tag className="mr-2 h-4 w-4" />
-              Category Management
+              Categories
+            </TabsTrigger>
+            <TabsTrigger value="payment">
+              <Landmark className="mr-2 h-4 w-4" />
+              Payment Details
             </TabsTrigger>
           </TabsList>
 
@@ -371,6 +421,168 @@ export function AdminPanelView({
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="payment" className="mt-6 space-y-6">
+            {/* Add new payment method */}
+            <Card className="rounded-2xl">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Landmark className="h-5 w-5" />
+                  Payment Methods
+                </CardTitle>
+                <CardDescription>
+                  Add payment options shown on invoices. Use free-form text for
+                  any format (bank transfer, PayPal, Korean wire, etc.).
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleAddPaymentMethod} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="newMethodName">Name</Label>
+                    <Input
+                      id="newMethodName"
+                      placeholder='e.g. "Australian Bank Transfer" or "Korean Wire Transfer"'
+                      value={newMethodName}
+                      onChange={(e) => setNewMethodName(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="newMethodDetails">Details</Label>
+                    <textarea
+                      id="newMethodDetails"
+                      className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-20 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                      placeholder={
+                        "e.g.\nBank: Commonwealth Bank\nBSB: 062-000\nAccount: 1234 5678\nName: John Smith"
+                      }
+                      value={newMethodDetails}
+                      onChange={(e) => setNewMethodDetails(e.target.value)}
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    disabled={
+                      isCreatingPaymentMethod ||
+                      !newMethodName.trim() ||
+                      !newMethodDetails.trim()
+                    }
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    {isCreatingPaymentMethod
+                      ? "Adding..."
+                      : "Add Payment Method"}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+
+            {/* Existing payment methods */}
+            {paymentMethods.length > 0 && (
+              <div className="space-y-3">
+                {paymentMethods.map((method) => (
+                  <Card key={method.id} className="rounded-2xl">
+                    <CardContent className="pt-6">
+                      {editingMethodId === method.id ? (
+                        <div className="space-y-3">
+                          <Input
+                            value={editMethodName}
+                            onChange={(e) => setEditMethodName(e.target.value)}
+                          />
+                          <textarea
+                            className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-20 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                            value={editMethodDetails}
+                            onChange={(e) =>
+                              setEditMethodDetails(e.target.value)
+                            }
+                          />
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={handleSaveEditMethod}
+                              disabled={isUpdatingPaymentMethod}
+                            >
+                              {isUpdatingPaymentMethod ? "Saving..." : "Save"}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setEditingMethodId(null)}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-semibold">{method.name}</h3>
+                              {!method.isActive && (
+                                <Badge variant="secondary">Disabled</Badge>
+                              )}
+                            </div>
+                            <pre className="text-muted-foreground mt-2 font-sans text-sm whitespace-pre-wrap">
+                              {method.details}
+                            </pre>
+                          </div>
+                          <div className="flex shrink-0 items-center gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => startEditingMethod(method)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                onUpdatePaymentMethod({
+                                  id: method.id,
+                                  isActive: !method.isActive,
+                                })
+                              }
+                              disabled={isUpdatingPaymentMethod}
+                            >
+                              {method.isActive ? "Disable" : "Enable"}
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    Delete Payment Method
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to delete &quot;
+                                    {method.name}&quot;? This cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() =>
+                                      onDeletePaymentMethod(method.id)
+                                    }
+                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </BlurFade>

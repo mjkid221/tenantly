@@ -15,6 +15,34 @@
       "when": 1771932841544,
       "tag": "0001_open_demogoblin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1774236417107,
+      "tag": "0002_modern_malice",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1774236672601,
+      "tag": "0003_fantastic_bill_hollister",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1774257473664,
+      "tag": "0004_skinny_enchantress",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1774258337858,
+      "tag": "0005_right_drax",
+      "breakpoints": true
     }
   ]
 }

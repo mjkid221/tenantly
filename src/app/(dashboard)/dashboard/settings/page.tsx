@@ -4,7 +4,7 @@ import { SettingsForm } from "./_components/settings-form";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Settings - Property Manager",
+  title: "Settings - Tenantly",
 };
 
 export default async function SettingsPage() {
