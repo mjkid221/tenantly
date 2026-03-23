@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Building2, Plus, Search, MapPin } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
@@ -26,10 +27,12 @@ function PropertyCard({
       <MagicCard className="overflow-hidden rounded-2xl" gradientOpacity={0.1}>
         <div className="bg-muted relative aspect-video w-full overflow-hidden">
           {firstImage && imageBaseUrl ? (
-            <img
+            <Image
               src={`${imageBaseUrl}${firstImage.storagePath}`}
               alt={property.name}
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              fill
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              unoptimized
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center">

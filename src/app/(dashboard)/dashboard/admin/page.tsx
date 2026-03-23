@@ -4,12 +4,13 @@ import { AdminPanel } from "./_components/admin-panel";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Admin Panel - Property Manager",
+  title: "Admin Panel - Tenantly",
 };
 
 export default async function AdminPage() {
   void api.admin.listAdmins.prefetch();
   void api.invoices.listCategories.prefetch();
+  void api.settings.listAllPaymentMethods.prefetch();
 
   return (
     <HydrateClient>

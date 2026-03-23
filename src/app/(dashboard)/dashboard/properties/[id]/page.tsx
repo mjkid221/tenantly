@@ -3,7 +3,7 @@ import { PropertyDetail } from "./_components/property-detail";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Property Details - Property Manager" };
+export const metadata = { title: "Property Details - Tenantly" };
 
 export default async function PropertyDetailPage({
   params,
@@ -18,6 +18,7 @@ export default async function PropertyDetailPage({
   void api.properties.getImageUrl.prefetch({ storagePath: "" });
   void api.contracts.listByProperty.prefetch({ propertyId });
   void api.invoices.list.prefetch({ propertyId });
+  void api.documents.listByProperty.prefetch({ propertyId });
 
   return (
     <HydrateClient>

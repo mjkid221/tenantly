@@ -1,14 +1,26 @@
 import { z } from "zod";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { users } from "~/server/db/schema";
+import { users, propertyTenants } from "~/server/db/schema";
 
 export const userRouter = createTRPCRouter({
   me: protectedProcedure.query(async ({ ctx }) => {
+    let isActiveTenant = false;
+    if (ctx.role !== "admin") {
+      const tenancy = await ctx.db.query.propertyTenants.findFirst({
+        where: and(
+          eq(propertyTenants.userId, ctx.user.id),
+          eq(propertyTenants.isActive, true),
+        ),
+      });
+      isActiveTenant = !!tenancy;
+    }
+
     return {
       ...ctx.user,
       role: ctx.role,
+      isActiveTenant,
     };
   }),
 

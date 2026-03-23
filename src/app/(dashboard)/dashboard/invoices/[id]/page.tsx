@@ -4,7 +4,7 @@ import { InvoiceDetail } from "./_components/invoice-detail";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Invoice Detail - Property Manager",
+  title: "Invoice Detail - Tenantly",
 };
 
 export default async function InvoiceDetailPage({

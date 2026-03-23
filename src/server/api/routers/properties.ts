@@ -291,11 +291,31 @@ export const propertiesRouter = createTRPCRouter({
       return updated;
     }),
 
-  listTenants: adminProcedure
+  listTenants: protectedProcedure
     .input(z.object({ propertyId: z.number() }))
     .query(async ({ ctx, input }) => {
+      // Tenants can only view co-tenants for properties they're assigned to
+      if (ctx.role === "tenant") {
+        const assignment = await ctx.db.query.propertyTenants.findFirst({
+          where: and(
+            eq(propertyTenants.propertyId, input.propertyId),
+            eq(propertyTenants.userId, ctx.user.id),
+            eq(propertyTenants.isActive, true),
+          ),
+        });
+        if (!assignment) {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+      }
+
       return ctx.db.query.propertyTenants.findMany({
-        where: eq(propertyTenants.propertyId, input.propertyId),
+        where:
+          ctx.role === "admin"
+            ? eq(propertyTenants.propertyId, input.propertyId)
+            : and(
+                eq(propertyTenants.propertyId, input.propertyId),
+                eq(propertyTenants.isActive, true),
+              ),
         with: { user: true },
         orderBy: (pt, { desc }) => [desc(pt.isActive), desc(pt.createdAt)],
       });

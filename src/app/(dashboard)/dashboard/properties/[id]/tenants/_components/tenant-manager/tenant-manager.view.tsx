@@ -326,8 +326,8 @@ export function TenantManagerView({
               </CardContent>
             </Card>
 
-            {/* Inactive Tenants */}
-            {inactiveTenants.length > 0 && (
+            {/* Inactive Tenants — admin only */}
+            {isAdmin && inactiveTenants.length > 0 && (
               <Card className="rounded-2xl">
                 <CardHeader>
                   <CardTitle className="text-muted-foreground flex items-center gap-2 text-base font-semibold">

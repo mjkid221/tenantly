@@ -3,7 +3,7 @@ import { InvoiceList } from "./_components/invoice-list";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Invoices - Property Manager" };
+export const metadata = { title: "Invoices - Tenantly" };
 
 export default async function InvoicesPage({
   params,

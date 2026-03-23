@@ -3,7 +3,7 @@ import { TenantManager } from "./_components/tenant-manager";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Tenants - Property Manager" };
+export const metadata = { title: "Tenants - Tenantly" };
 
 export default async function TenantsPage({
   params,

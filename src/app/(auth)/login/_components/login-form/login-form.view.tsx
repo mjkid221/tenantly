@@ -1,6 +1,7 @@
 "use client";
 
-import { Building2 } from "lucide-react";
+import { useState } from "react";
+import { Building2, Mail, CheckCircle2 } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -9,13 +10,26 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
+import { Separator } from "~/components/ui/separator";
 import type { LoginFormViewProps } from "./login-form.types";
 
 export function LoginFormView({
   onOAuthLogin,
+  onMagicLinkLogin,
   isLoading,
+  magicLinkSent,
   error,
 }: LoginFormViewProps) {
+  const [email, setEmail] = useState("");
+
+  const handleMagicLinkSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email.trim()) {
+      onMagicLinkLogin(email.trim());
+    }
+  };
+
   return (
     <div className="bg-background flex min-h-screen items-center justify-center px-4">
       <Card className="w-full max-w-md">
@@ -23,7 +37,7 @@ export function LoginFormView({
           <div className="bg-primary mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl">
             <Building2 className="text-primary-foreground h-7 w-7" />
           </div>
-          <CardTitle className="text-2xl font-bold">Property Manager</CardTitle>
+          <CardTitle className="text-2xl font-bold">Tenantly</CardTitle>
           <CardDescription>
             Sign in to access your property dashboard
           </CardDescription>
@@ -77,8 +91,45 @@ export function LoginFormView({
             Continue with Microsoft
           </Button>
 
+          <div className="relative py-2">
+            <Separator />
+            <span className="bg-card text-muted-foreground absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-2 text-xs">
+              or
+            </span>
+          </div>
+
+          {magicLinkSent ? (
+            <div className="flex flex-col items-center gap-2 rounded-md border p-4 text-center">
+              <CheckCircle2 className="h-8 w-8 text-green-500" />
+              <p className="text-sm font-medium">Check your email</p>
+              <p className="text-muted-foreground text-xs">
+                We sent a login link to <strong>{email}</strong>
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={handleMagicLinkSubmit} className="space-y-3">
+              <Input
+                type="email"
+                placeholder="Enter your email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+                required
+              />
+              <Button
+                type="submit"
+                variant="outline"
+                className="w-full"
+                disabled={isLoading || !email.trim()}
+              >
+                <Mail className="mr-2 h-4 w-4" />
+                Send Magic Link
+              </Button>
+            </form>
+          )}
+
           <div className="text-muted-foreground pt-2 text-center text-xs">
-            Sign in with your Google, Hotmail, Yahoo, or Outlook account
+            Sign in with your Google, Microsoft, or any email account
           </div>
         </CardContent>
       </Card>

@@ -1,5 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar";
 import { AppSidebar } from "./_components/app-sidebar";
+import { ChatWidget } from "./_components/chat-widget";
 import { Separator } from "~/components/ui/separator";
 
 export default function DashboardLayout({
@@ -17,6 +18,7 @@ export default function DashboardLayout({
         </header>
         <div className="flex-1 overflow-auto p-6">{children}</div>
       </main>
+      <ChatWidget />
     </SidebarProvider>
   );
 }

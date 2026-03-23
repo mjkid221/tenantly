@@ -7,7 +7,9 @@ import {
   FileText,
   Download,
   AlertCircle,
+  ImageOff,
 } from "lucide-react";
+import { getPublicStorageUrl } from "~/lib/url";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -136,8 +138,22 @@ export function GuestPropertyViewComponent({
                         key={image.id}
                         className="overflow-hidden rounded-lg border"
                       >
-                        <div className="bg-muted flex h-32 items-center justify-center">
-                          <Building2 className="text-muted-foreground h-8 w-8" />
+                        <img
+                          src={getPublicStorageUrl(
+                            "property-images",
+                            image.storagePath,
+                          )}
+                          alt={image.fileName}
+                          className="h-48 w-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                            e.currentTarget.nextElementSibling?.classList.remove(
+                              "hidden",
+                            );
+                          }}
+                        />
+                        <div className="bg-muted hidden h-48 items-center justify-center">
+                          <ImageOff className="text-muted-foreground h-8 w-8" />
                         </div>
                         <div className="p-2">
                           <p className="text-muted-foreground truncate text-xs">

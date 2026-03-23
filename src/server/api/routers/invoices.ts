@@ -14,6 +14,7 @@ import {
   invoiceCategories,
   invoiceAttachments,
   propertyTenants,
+  paymentMethods,
 } from "~/server/db/schema";
 import { supabaseAdmin } from "~/lib/supabase/admin";
 import { resend } from "~/lib/resend";
@@ -626,6 +627,12 @@ export const invoicesRouter = createTRPCRouter({
         0,
       );
 
+      // Fetch active payment methods for the email
+      const activePaymentMethods = await ctx.db.query.paymentMethods.findMany({
+        where: eq(paymentMethods.isActive, true),
+        orderBy: (pm, { asc }) => [asc(pm.sortOrder), asc(pm.createdAt)],
+      });
+
       const html = buildInvoiceEmailHtml({
         propertyName: invoice.property.name,
         billingPeriodStart: invoice.billingPeriodStart,
@@ -638,10 +645,14 @@ export const invoicesRouter = createTRPCRouter({
         })),
         totalCharged,
         notes: invoice.notes,
+        paymentMethods: activePaymentMethods.map((pm) => ({
+          name: pm.name,
+          details: pm.details,
+        })),
       });
 
       const { error: sendError } = await resend.emails.send({
-        from: "Property Manager <onboarding@resend.dev>",
+        from: "Tenantly <noreply@tenantly.icu>",
         to: tenantEmails,
         subject: `Invoice: ${invoice.property.name} – ${invoice.billingPeriodStart} to ${invoice.billingPeriodEnd}`,
         html,

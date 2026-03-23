@@ -81,6 +81,8 @@ export function InvoiceListView({
   isAdmin,
   statusFilter,
   onStatusFilterChange,
+  propertyFilter,
+  onPropertyFilterChange,
   isCreateDialogOpen,
   onCreateDialogOpenChange,
   properties,
@@ -270,23 +272,47 @@ export function InvoiceListView({
                   found
                 </CardDescription>
               </div>
-              <Select
-                value={statusFilter}
-                onValueChange={(v) =>
-                  onStatusFilterChange(v as InvoiceStatus | "all")
-                }
-              >
-                <SelectTrigger className="w-45">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="issued">Issued</SelectItem>
-                  <SelectItem value="partially_paid">Partially Paid</SelectItem>
-                  <SelectItem value="paid">Paid</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex items-center gap-2">
+                <Select
+                  value={
+                    propertyFilter === "all" ? "all" : String(propertyFilter)
+                  }
+                  onValueChange={(v) =>
+                    onPropertyFilterChange(v === "all" ? "all" : Number(v))
+                  }
+                >
+                  <SelectTrigger className="w-48">
+                    <SelectValue placeholder="Filter by property" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Properties</SelectItem>
+                    {properties.map((p) => (
+                      <SelectItem key={p.id} value={String(p.id)}>
+                        {p.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select
+                  value={statusFilter}
+                  onValueChange={(v) =>
+                    onStatusFilterChange(v as InvoiceStatus | "all")
+                  }
+                >
+                  <SelectTrigger className="w-45">
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="issued">Issued</SelectItem>
+                    <SelectItem value="partially_paid">
+                      Partially Paid
+                    </SelectItem>
+                    <SelectItem value="paid">Paid</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
