@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/health",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/unread-messages",
+      "schedule": "0 */12 * * *"
     }
   ]
 }
